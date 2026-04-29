@@ -1,0 +1,2219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/13802/13802827.png" type="image/icon type">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Template from ViPeR • Outage & Maintenance</title>
+
+  <meta name="color-scheme" content="light dark">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #0f172a;
+      --panel-2: #111827;
+      --muted: #94a3b8;
+      --text: #e5e7eb;
+      --brand: #4f46e5;
+      --brand-2: #6366f1;
+      --ok: #10b981;
+      --warn: #f59e0b;
+      --err: #ef4444;
+      --border: #1f2a44;
+      --radius: 14px;
+      --save-red: #ef4444;
+      --load-orange: #f59e0b;
+    }
+
+    /* Reset */
+    * { box-sizing: border-box; }
+    html, body { height: 92%; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: linear-gradient(180deg, #0b1020 0%, #0c1326 100%);
+      color: var(--text);
+      padding: 0 8px;
+      overflow-x: hidden;
+    }
+    a { color: inherit; }
+    
+    .hidden {
+      display: none !important;
+    }
+
+    /* Layout */
+    .app {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 8px;
+      max-width: 1400px;
+      margin: 24px auto 0;
+      align-items: start;
+    }
+    @media (max-width: 1060px) {
+      .app { grid-template-columns: 1fr; }
+    }
+    
+    .left-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.02);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    #nepaliCalendarCard {
+      align-items: center;
+      justify-content: center;
+    }
+
+    .header {
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between;
+      padding: 16px 18px; 
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+    .title { font-size: 18px; font-weight: 700; letter-spacing: 0.2px; }
+    .subtle { color: var(--muted); font-weight: 500; }
+
+    .header-icons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: fixed;
+      left: 25px;
+      top: 24px;
+    }
+    .header-icons a {
+      color: var(--muted);
+      transition: color 0.2s ease-in-out;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .header-icons a:hover {
+      color: var(--text);
+    }
+    .header-icons svg {
+      width: 20px;
+      height: 20px;
+    }
+    
+    .floating-nav {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 100;
+      padding: 10px 20px;
+      border-radius: 999px;
+      background: linear-gradient(45deg, var(--brand), var(--brand-2));
+      box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      animation: pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+      transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    
+    .floating-nav:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.6), inset 0 1px 0 rgba(255, 255,255, 0.2);
+    }
+    
+    .floating-nav a {
+      color: white;
+      font-weight: 700;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.02);
+      }
+    }
+
+    /* --- Segmented Controls --- */
+    .segmented-control {
+      display: inline-flex;
+      gap: 0;
+      background: #0e1530;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 4px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+    
+    .segmented-control button {
+      appearance: none;
+      border: 0;
+      padding: 8px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 700;
+      letter-spacing: .2px;
+      white-space: nowrap;
+    }
+
+    .segmented-control button.active {
+      background: var(--brand);
+      color: white;
+      box-shadow: 0 4px 12px rgba(79,70,229,.2);
+    }
+    
+    .switch .knob.on { background: var(--ok); }
+    .switch .knob.off { background: var(--muted); }
+
+    /* Forms */
+    .panel { padding: 16px; flex-grow: 1; }
+    .grid { display: grid; gap: 12px; }
+    .grid.two { grid-template-columns: 1fr 1fr; }
+    .grid.three { grid-template-columns: 1fr 1fr 1fr; }
+    .grid.four { grid-template-columns: repeat(4, 1fr); }
+    @media (max-width: 640px) {
+      .grid.two, .grid.three, .grid.four { grid-template-columns: 1fr; }
+    }
+
+    label { font-size: 12px; color: var(--muted); letter-spacing: .3px; }
+    .field { display: grid; gap: 6px; }
+    .input, select, textarea {
+      width: 100%; padding: 12px 12px; border-radius: 12px; background: #0e1530;
+      border: 1px solid var(--border); color: var(--text); font-size: 14px;
+      outline: none; transition: border-color .15s, box-shadow .15s;
+    }
+    .input:focus, select:focus, textarea:focus { border-color: var(--brand-2); box-shadow: 0 0 0 4px rgba(79,70,229,.15); }
+
+    .row { display: flex; align-items: center; gap: 10px; }
+
+    .hint { color: var(--muted); font-size: 12px; }
+
+    /* Time group */
+    .time-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .time-chip { display: inline-flex; align-items: center; gap: 8px; }
+
+    /* Toggle */
+    .switch {
+      position: relative; width: 50px; height: 28px; background: #0e1530; border: 1px solid var(--border);
+      border-radius: 999px; cursor: pointer; transition: background .2s;
+    }
+    .switch input { display:none; }
+    .switch .knob {
+      position: absolute; top: 2px; left: 2px; width: 22px; height: 22px; background: white; border-radius: 50%;
+      transition: transform .2s; box-shadow: 4px 12px rgba(0,0,0,.4);
+    }
+    .switch input:checked + .knob { transform: translateX(22px); background: #34D399; }
+    
+    /* Output */
+    .outputs { 
+      padding: 0; 
+      transition: none;
+    }
+
+    .output-scroll-container {
+      flex-grow: 1;
+    }
+    
+    .out-section {
+      padding: 8px;
+      border-top: 1px solid var(--border);
+    }
+    .out-section:first-child {
+      border-top: none;
+    }
+
+    .out-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 10px;
+    }
+
+    .out-header h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      margin: 0;
+    }
+    
+    .out-header.centered {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .out-header.centered h3 {
+      flex-grow: 1;
+      text-align: center;
+    }
+
+    .out-footer {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .out-footer.np {
+      justify-content: space-between;
+    }
+
+    .out-header.np {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+    }
+
+    .out-header.np h3 {
+      justify-self: start;
+    }
+
+    .out-header.np .count {
+      justify-self: center;
+    }
+
+    .out-header.np button {
+      justify-self: end;
+    }
+
+    pre.text {
+      white-space: pre-wrap; line-height: 1.5; background: #0c1228; border: 1px dashed var(--border);
+      border-radius: 12px; padding: 12px; font-size: 14px; color: var(--text);
+    }
+    
+    .btn {
+      appearance: none; border: 1px solid var(--border); background: #0e1530; color: var(--text);
+      padding: 10px 12px; border-radius: 10px; cursor: pointer; font-weight: 700; letter-spacing: .2px;
+      transition: all 0.2s ease-in-out;
+    }
+    .btn.primary { background: var(--brand); border-color: transparent; color: white; }
+    .btn.primary:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(79,70,229,.2);
+    }
+    .btn.ghost { background: transparent; }
+    
+    .copy-btn {
+      appearance: none;
+      border: 1px solid transparent;
+      background: var(--brand);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s ease-in-out;
+    }
+    
+    .copy-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(79,70,229,.2);
+    }
+
+    /* NEW: Save and Load buttons */
+    .save-btn {
+      appearance: none;
+      border: 1px solid transparent;
+      background: linear-gradient(45deg, var(--save-red), #dc2626);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s ease-in-out;
+    }
+    
+    .save-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+    }
+    
+    .load-btn {
+      appearance: none;
+      border: 1px solid transparent;
+      background: linear-gradient(45deg, var(--load-orange), #d97706);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s ease-in-out;
+    }
+    
+    .load-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+    }
+
+    .count { font-size: 12px; color: var(--muted); }
+    .count.warn { color: var(--err); font-weight: 700; }
+
+    .ribbon {
+      padding: 8px 12px; border-top-left-radius: var(--radius); border-top-right-radius: var(--radius);
+      background: #0e1530; border-bottom: 1px solid var(--border); color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 12px; background: #0e1530; border: 1px solid var(--border); padding: 2px 6px; border-radius: 6px; color: var(--muted); }
+  
+    /* Modal styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    
+    .modal {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      width: 90%;
+      max-width: 400px;
+      padding: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    
+    .modal-header {
+      margin-bottom: 20px;
+    }
+    
+    .modal-header h3 {
+      margin: 0;
+      font-size: 18px;
+      color: var(--text);
+    }
+    
+    .modal-input {
+      width: 100%;
+      margin: 12px 0;
+      padding: 12px;
+      border-radius: 10px;
+      background: #0e1530;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 16px;
+      text-align: center;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    
+    .modal-input::placeholder {
+      letter-spacing: normal;
+      text-transform: none;
+    }
+    
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    
+    .modal-actions button {
+      flex: 1;
+    }
+    
+    .saved-items-list {
+      max-height: 300px;
+      overflow-y: auto;
+      margin: 15px 0;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+    }
+    
+    .saved-item {
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .saved-item:hover {
+      background: rgba(255,255,255,0.05);
+    }
+    
+    .saved-item:last-child {
+      border-bottom: none;
+    }
+    
+    .saved-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+    
+    .saved-item-code {
+      background: var(--brand);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 12px;
+    }
+    
+    .saved-item-time {
+      color: var(--muted);
+      font-size: 11px;
+    }
+    
+    .saved-item-content {
+      font-size: 13px;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .saved-item-meta {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    
+    .no-saved-items {
+      text-align: center;
+      color: var(--muted);
+      padding: 20px;
+      font-style: italic;
+    }
+    
+    .expired {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
+    /* NEW: Notepad Styles */
+    .notepad-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+    }
+    
+    .notepad-toggle {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, var(--brand), var(--brand-2));
+      border: none;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .notepad-toggle:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.6);
+    }
+    
+    .notepad-toggle .badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: var(--err);
+      color: white;
+      font-size: 10px;
+      font-weight: bold;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .notepad {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      width: 450px;
+      max-height: 400px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      transition: all 0.3s ease;
+      transform-origin: bottom right;
+    }
+    
+    .notepad.hidden {
+      display: none;
+    }
+    
+    .notepad-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .notepad-header h3 {
+      margin: 0;
+      font-size: 16px;
+      color: var(--text);
+    }
+    
+    .notepad-close {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 18px;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    
+    .notepad-close:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+    }
+    
+    .notepad-body {
+      flex: 1;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .notepad-textarea {
+      width: 100%;
+      height: 250px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #0e1530;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    
+    .notepad-textarea:focus {
+      border-color: var(--brand-2);
+    }
+    
+    .notepad-stats {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+    
+    .notepad-counter {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    
+    .counter-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    
+    .counter-value {
+      font-weight: bold;
+      color: var(--text);
+      min-width: 40px;
+    }
+    
+    .counter-value.total {
+      color: var(--brand);
+    }
+    
+    .counter-value.selected {
+      color: var(--ok);
+    }
+    
+    .counter-value.chars {
+      color: var(--warn);
+    }
+    
+    .notepad-actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .notepad-btn {
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: #0e1530;
+      border: 1px solid var(--border);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    
+    .notepad-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    
+    .notepad-btn.clear {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: rgba(239, 68, 68, 0.3);
+      color: var(--err);
+    }
+    
+    .notepad-btn.clear:hover {
+      background: rgba(239, 68, 68, 0.2);
+    }
+    
+    .notepad-btn.copy {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: var(--ok);
+    }
+    
+    .notepad-btn.copy:hover {
+      background: rgba(16, 185, 129, 0.2);
+    }
+    
+    /* Responsive adjustments for notepad */
+    @media (max-width: 768px) {
+      .notepad {
+        width: 300px;
+      }
+      
+      .notepad-container {
+        bottom: 80px; /* Move up to avoid floating nav */
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .notepad {
+        width: calc(100vw - 40px);
+        max-width: 300px;
+      }
+    }
+  </style>
+</head>
+<body>
+     <!-- NEW: Eye-catching navigation link
+    <div class="floating-nav">
+      <a href="https://outage.bjkarn.com.np/v5" target="_blank">Test another version: Version Final</a>
+    </div> -->
+
+  <div class="app">
+    <!-- Left: Controls -->
+    <div class="left-panel">
+      <section class="card">
+        <div class="header">
+          <div class="title">Template from ViPeR</div>
+          <div class="segmented-control" role="tablist" aria-label="Mode">
+            <button id="modeOutage" class="active" onclick="setMode('outage')">Outage</button>
+            <button id="modeMaintenance" onclick="setMode('maintenance')">Maintenance</button>
+          </div>
+        </div>
+  
+        <div id="forms" class="panel grid" aria-live="polite"></div>
+  
+        <div class="panel" style="border-top:1px solid var(--border); display:flex; gap:10px; align-items:center; justify-content:space-between; border-bottom-left-radius: var(--radius); border-bottom-right-radius: var(--radius);">
+          <div class="hint">  • Company <span class="kbd">ViPeR</span><br>  • Contact <span class="kbd">9801464801</span></div>
+          <div class="row">
+            <button class="btn" onclick="clearAll()">Clear</button>
+            <button class="btn ghost" onclick="window.open('https://bjkarn.com.np', '_blank')">Link to the Owner</button>
+          </div>
+        </div>
+      </section>
+      
+      <section class="card" id="nepaliCalendarCard">
+        <iframe src="https://www.hamropatro.com/widgets/calender-medium.php" frameborder="0" scrolling="no" marginwidth="0" marginheight="0" style="border:none; overflow:hidden; width:295px; height:325px; border-radius:var(--radius);" allowtransparency="true"></iframe>
+      </section>
+    </div>
+
+    <!-- Right: Outputs (sticky / docked on mobile) -->
+    <section class="outputs card sticky" id="outputCard">
+      <div class="ribbon">
+        <div><strong>Preview</strong> <span class="subtle" id="previewLabel">Outage</span></div>
+        <!-- NEW: Save and Load buttons in the ribbon -->
+        <div class="row" style="gap: 8px;">
+          <button class="save-btn" onclick="openSaveModal()" title="Save current template">
+            <i class="fas fa-save"></i> Save
+          </button>
+          <button class="load-btn" onclick="openLoadModal()" title="Load saved template">
+            <i class="fas fa-folder-open"></i> Load
+          </button>
+        </div>
+      </div>
+      <div id="outBodies" class="dock-body output-scroll-container">
+        <!-- Dynamic message panes go here -->
+      </div>
+    </section>
+  </div>
+ 
+
+  <!-- NEW: Notepad Container -->
+  <div class="notepad-container">
+    <div id="notepad" class="notepad hidden">
+      <div class="notepad-header">
+        <h3>Quick Notepad</h3>
+        <button class="notepad-close" onclick="toggleNotepad()" title="Close notepad">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="notepad-body">
+        <textarea 
+          id="notepadTextarea" 
+          class="notepad-textarea" 
+          placeholder="Type or paste your notes here... (400-500 characters max)"
+          maxlength="500"
+          oninput="updateNotepadCount()"
+          onselect="updateSelectedCount()"
+        ></textarea>
+        
+        <div class="notepad-stats">
+          <div class="notepad-counter">
+            <div class="counter-item">
+              <span>Total Words:</span>
+              <span id="totalWordsCount" class="counter-value total">0</span>
+            </div>
+            <div class="counter-item">
+              <span>Selected Words:</span>
+              <span id="selectedWordsCount" class="counter-value selected">0</span>
+            </div>
+            <div class="counter-item">
+              <span>Characters:</span>
+              <span id="charCount" class="counter-value chars">0/500</span>
+            </div>
+          </div>
+          <div class="notepad-actions">
+            <button class="notepad-btn clear" onclick="clearNotepad()" title="Clear all text">
+              <i class="fas fa-trash"></i> Clear
+            </button>
+            <button class="notepad-btn copy" onclick="copyNotepad()" title="Copy to clipboard">
+              <i class="fas fa-copy"></i> Copy
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <button id="notepadToggle" class="notepad-toggle" onclick="toggleNotepad()" title="Toggle notepad">
+      <i class="fas fa-sticky-note"></i>
+      <span id="notepadBadge" class="badge hidden">0</span>
+    </button>
+  </div>
+
+  <!-- NEW: Save Modal -->
+  <div id="saveModal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Save Template</h3>
+        <div class="hint">Enter a 4-digit code to save the current template</div>
+      </div>
+      <input type="text" id="saveCodeInput" class="modal-input" placeholder="e.g., ABCD" maxlength="4" pattern="[A-Za-z0-9]{4}" title="4 letters or numbers">
+      <div class="modal-actions">
+        <button class="btn" onclick="closeSaveModal()">Cancel</button>
+        <button class="btn primary" onclick="saveTemplate()">Save Template</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEW: Load Modal -->
+  <div id="loadModal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Load Saved Template</h3>
+        <div class="hint">Select a saved template to load (expires after 8 hours)</div>
+      </div>
+      <div id="savedItemsList" class="saved-items-list">
+        <!-- Saved items will be populated here -->
+      </div>
+      <div class="modal-actions">
+        <button class="btn" onclick="closeLoadModal()">Close</button>
+        <button class="btn" onclick="clearAllSavedTemplates()">Clear All</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+
+
+// Function to check login and connection status
+  function checkAccess() {
+    const isLoggedIn = sessionStorage.getItem("isLoggedIn") === "true";
+    const isOnline = navigator.onLine;
+
+    if (!isLoggedIn || !isOnline) {
+      // Clear login if offline or not logged in
+      sessionStorage.removeItem("isLoggedIn");
+      window.location.href = "../login/";
+    }
+  }
+  sessionStorage.setItem("isLoggedIn", "true");
+
+  
+    // ======= State =======
+    let activeMode = 'outage';
+    let activeOutageSubMode = 'normal';
+    let activeRainMode = 'off';
+    const COMPANY = 'WorldLink'; 
+    const CONTACT = '9801523051';
+    
+    // Split RFOs into normal and special cases
+    const normalRfoList = [
+      "Fiber breakage", "Fiber pulled by Vehicle", "Electric Short Circuit", "Pole breakage", "Pole shifting by NEA",
+      "Fiber Cut by NEA", "Pole shifting by NTC", "Fallen Tree", "Fiber Burn", "Fire on Pole", "Road expansion", "Pole removed by NEA",
+      "Pole removed by NTC", "Fiber Cut by Municipality", "Landslide", "Flood", "Fiber Management by ward", "Fiber Management by Municipality", "Others"
+    ];
+    
+    const specialRfoList = [
+      "Rato Machhindranath", "Seto Machhindranath", "Technical Issue"
+    ];
+    
+    // NEW: Storage key for saved templates
+    const STORAGE_KEY = 'template_saves';
+    
+    // NEW: Storage key for notepad
+    const NOTEPAD_STORAGE_KEY = 'template_notepad';
+    
+    // RFO Nepali mapping
+    const RFO_NEPALI_MAPPING = {
+      "Fiber breakage": "fiber kaatiyeko",
+      "Electric Short Circuit": "bijuli short circuit",
+      "Pole breakage": "pole dhaleko",
+      "Pole shifting by NEA": "NEA le pole sareko",
+      "Fiber Cut by NEA": "NEA le fiber kateko",
+      "Pole shifting by NTC": "NTC le pole sareko",
+      "Fallen Tree": "rukh dhalera fiber katiyeko",
+      "Fiber Burn": "fiber jaleko",
+      "Fiber pulled by Vehicle": "gaadi le fiber cable chudaaleko",
+      "Fire on Pole": "pole aaglagi",
+      "Road expansion": "baato badhaune kaam vayiraheko",
+      "Pole removed by NEA": "NEA le pole hatayeko",
+      "Pole removed by NTC": "NTC le pole hatayeko",
+      "Fiber Cut by Municipality": "Nagarpalika le fiber kateko",
+      "Others": "samaasya ko karan",
+      "Rato Machhindranath": "Rato Machindranath Jatra ko karan",
+      "Seto Machhindranath": "Seto Machindranath Jatra ko karan",
+      "Landslide": "pahiro gayeko",
+      "Flood": "badi le garda",
+      "Fiber Management by ward": "Ward dwara fiber kaatiyeko",
+      "Fiber Management by Municipality": "Nagarpalika dwara fiber kaatiyeko"
+    };
+
+    // ======= NEW: Notepad Functions =======
+    
+    /**
+     * Toggle notepad visibility
+     */
+    function toggleNotepad() {
+      const notepad = $('#notepad');
+      const isHidden = notepad.classList.contains('hidden');
+      
+      if (isHidden) {
+        notepad.classList.remove('hidden');
+        loadNotepadContent();
+        updateNotepadCount();
+      } else {
+        notepad.classList.add('hidden');
+      }
+    }
+    
+    /**
+     * Load saved notepad content from localStorage
+     */
+    function loadNotepadContent() {
+      try {
+        const savedContent = localStorage.getItem(NOTEPAD_STORAGE_KEY);
+        if (savedContent) {
+          $('#notepadTextarea').value = savedContent;
+        }
+      } catch (e) {
+        console.error('Error loading notepad content:', e);
+      }
+    }
+    
+    /**
+     * Save notepad content to localStorage
+     */
+    function saveNotepadContent() {
+      try {
+        const content = $('#notepadTextarea').value;
+        localStorage.setItem(NOTEPAD_STORAGE_KEY, content);
+      } catch (e) {
+        console.error('Error saving notepad content:', e);
+      }
+    }
+    
+    /**
+     * Count words in a text
+     */
+    function countWords(text) {
+      if (!text || text.trim() === '') return 0;
+      return text.trim().split(/\s+/).filter(word => word.length > 0).length;
+    }
+    
+    /**
+     * Update notepad character and word counts
+     */
+    function updateNotepadCount() {
+      const textarea = $('#notepadTextarea');
+      const text = textarea.value;
+      
+      // Update character count
+      const charCount = text.length;
+      $('#charCount').textContent = `${charCount}/500`;
+      
+      // Update total word count
+      const totalWords = countWords(text);
+      $('#totalWordsCount').textContent = totalWords;
+      
+      // Update badge if there's content
+      const badge = $('#notepadBadge');
+      if (charCount > 0) {
+        badge.textContent = charCount;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+      
+      // Save content automatically
+      saveNotepadContent();
+      
+      // Also update selected count in case selection changed
+      updateSelectedCount();
+    }
+    
+    /**
+     * Update selected text word count
+     */
+    function updateSelectedCount() {
+      const textarea = $('#notepadTextarea');
+      const selectedText = textarea.value.substring(textarea.selectionStart, textarea.selectionEnd);
+      const selectedWords = countWords(selectedText);
+      $('#selectedWordsCount').textContent = selectedWords;
+    }
+    
+    /**
+     * Clear notepad content
+     */
+    function clearNotepad() {
+      if (confirm('Clear all text from notepad?')) {
+        $('#notepadTextarea').value = '';
+        updateNotepadCount();
+      }
+    }
+    
+    /**
+     * Copy notepad content to clipboard
+     */
+    function copyNotepad() {
+      const textarea = $('#notepadTextarea');
+      const text = textarea.value;
+      
+      if (!text || text.trim() === '') {
+        alert('Notepad is empty. Nothing to copy.');
+        return;
+      }
+      
+      // Select the text
+      textarea.select();
+      textarea.setSelectionRange(0, text.length);
+      
+      // Copy to clipboard
+      try {
+        const success = document.execCommand('copy');
+        if (success) {
+          // Show success feedback
+          const copyBtn = document.querySelector('.notepad-btn.copy');
+          const originalHtml = copyBtn.innerHTML;
+          copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+          
+          setTimeout(() => {
+            copyBtn.innerHTML = originalHtml;
+          }, 1500);
+          
+          // Deselect text
+          textarea.setSelectionRange(0, 0);
+        }
+      } catch (err) {
+        // Fallback for older browsers
+        const tempTextArea = document.createElement('textarea');
+        tempTextArea.value = text;
+        document.body.appendChild(tempTextArea);
+        tempTextArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempTextArea);
+        
+        // Show success feedback
+        const copyBtn = document.querySelector('.notepad-btn.copy');
+        const originalHtml = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        
+        setTimeout(() => {
+          copyBtn.innerHTML = originalHtml;
+        }, 1500);
+      }
+    }
+    
+    /**
+     * Initialize notepad on load
+     */
+    function initNotepad() {
+      loadNotepadContent();
+      updateNotepadCount();
+      
+      // Add event listeners for selection changes
+      const textarea = $('#notepadTextarea');
+      textarea.addEventListener('mouseup', updateSelectedCount);
+      textarea.addEventListener('keyup', updateSelectedCount);
+      
+      // Auto-save on blur
+      textarea.addEventListener('blur', saveNotepadContent);
+    }
+
+    // ======= Templates =======
+    const OUTAGE_TEMPLATES = {
+      "Fiber breakage": {
+        np_with: "{{LOCATION}} najik fiber kaatiyeko hunale hamro sewa abharudha vayeko cha ra sewa sucharu huna aanumanit [ETR] lagne jankari garaudachau.",
+        np_without: "{{LOCATION}} najik fiber kaatiyeko hunale hamro sewa abharudha vayeko cha. Kaam thalani aghi hajur lai purna jankari garaunechau.",
+        en_without: "We are out of service at your area due to Fiber breakage near {{LOCATION}}. We are planning to take action for the resolution as soon as possible. We will update you again soon on the service status and estimated recovery time. \nWe apologize for the inconvenience."
+      },
+      "Electric Short Circuit": {
+        np_with: "{{LOCATION}} najik bijuli short circuit huda hamro sewa abharuddha vayeko cha ra sewa sucharu huna aanumanit [ETR] lagne jankari garaudachau.",
+        np_without: "{{LOCATION}} najik bijuli short circuit huda hamro sewa abharuddha vayeko cha. NEA ko kaam paschaat hamro kaam suru hune jaankari garaudachau.",
+        en_without: "We are out of service at your area due to an Electric short circuit near {{LOCATION}}. We will act for recovery only after NEA complete their work. We will keep you updated on the progress of maintenance. Thank you for your patience."
+      },
+      "Pole breakage": {
+        np_with: "{{LOCATION}} najik NEA ko pole dhaleko huda hamro sewa abharuddha vayeko cha ra sewa sucharu huna aanumanit [ETR] lagne jankari garaudachau.",
+        np_without: "{{LOCATION}} najik NEA ko pole dhaleko huda hamro sewa abharuddha vayeko cha. NEA ko kaam paschaat hamro kaam suru hune jaankari garaudachau.",
+        en_without: "We are out of service at your area due to Pole breakage near {{LOCATION}}. We are planning to take action for the resolution as soon as possible. We will update you again soon on the service status and estimated recovery time. \nWe apologize for the inconvenience."
+      },
+      "Pole shifting by NEA": {
+        np_with: "{{LOCATION}} najik NEA le pole sareko hunale hamro sewa abharuddha vayeko cha ra sewa sucharu huna aanumanit [ETR] lagne jankari garaudachau.",
+        np_without: "{{LOCATION}} najik NEA le pole sareko hunale hamro sewa abharuddha vayeko cha. NEA ko kaam paschaat hamro kaam suru hune jaankari garaudachau.",
+        en_without: "We are out of service at your area due to Pole shifting by NEA near {{LOCATION}}. We will act for recovery only after NEA complete their work. We will keep you updated on the progress of maintenance. Thank you for your patience."
+      },
+      "Fiber Cut by NEA": {
+        np_with: "{{LOCATION}} najik NEA le fiber kateko hunale hamro sewa abharudha vayeko cha ra sewa sucharu huna aanumanit [ETR] lagne jankari garaudachau.",
+        np_without: "{{LOCATION}} najik NEA le fiber kateko hunale hamro sewa abharudha vayeko cha. NEA ko Kaam paschaat hamro kaam suru hune jankari garaudachau.",
+        en_without: "We are out of service at your area due to Fiber cut by NEA near {{LOCATION}}. We are planning to take action for the resolution as soon as possible. We will update you again soon on the service status and estimated recovery time. \nWe apologize for the inconvenience."
+      },
+      "Pole shifting by NTC": {
+        np_with: "{{LOCATION}} najik NTC le pole sareko hunale hamro sewa abharuddha vayeko cha ra sewa sucharu huna aanumanit [ETR] lagne jankari garaudachau.",
+        np_without: "{{LOCATION}} najik NTC le pole sareko hunale hamro sewa abharuddha vayeko cha. NTC ko kaam paschaat hamro kaam suru hune jaankari garaudachau.",
+        en_without: "We are out of service at your area due to Pole shifting by NTC near {{LOCATION}}. We will act for recovery only after NTC complete their work. We will keep you updated on the progress of maintenance. Thank you for your patience."
+      },
+      
+      "Fallen Tree": {
+        np_with: "{{LOCATION}} najik rukh dhaleko karan fiber katiyeko hunale hamro sewa abharuddha vayeko cha ra sewa sucharu huna aanumanit [ETR] lagne jankari garaudachau.",
+        np_without: "{{LOCATION}} najik rukh dhalera fiber katiyeko hunale hamro sewa abharuddha vayeko cha. Kaam thalani aghi hajur lai purna jankari garaunechau.",
+        en_without: "We are out of service at your area due to Fallen Tree near {{LOCATION}}. We are planning to take action for the resolution as soon as possible. We will update you again soon on the service status and estimated recovery time. \nWe apologize for the inconvenience."
+      },
+      "Fiber Burn": {
+        np_with: "{{LOCATION}} najik fiber jaleko hunale hamro sewa abharuddha vayeko cha ra sewa sucharu huna aanumanit [ETR] lagne jankari garaudachau.",
+        np_without: "{{LOCATION}} najik fiber jaleko hunale hamro sewa abharuddha vayeko cha. NEA ko Kaam paschaat hamro kaam suru hune jankari garaudachau.",
+        en_without: "We are out of service at your area due to Fiber burn near {{LOCATION}}. We are planning to take action for the resolution as soon as possible. We will update you again soon on the service status and estimated recovery time. \nWe apologize for the inconvenience."
+      },
+      "Fiber pulled by Vehicle": {
+        np_with: "{{LOCATION}} najik gadi le fiber cable chudaaleko huda hamro sewa abharuddha vayeko cha ra sewa sucharu huna aanumanit [ETR] lagne jankari garaudachau.",
+        np_without: "{{LOCATION}} najik gadi le fiber cable chudaaleko huda hamro sewa abharuddha vayeko cha. Kaam thalani aghi hajur lai purna jankari garaunechau.",
+        en_without: "We are out of service at your area due to Fiber pulled by Vehicle near {{LOCATION}}. We are planning to take action for the resolution as soon as possible. We will update you again soon on the service status and estimated recovery time. \nWe apologize for the inconvenience."
+      },
+      "Fire on Pole": {
+        np_with: "{{LOCATION}} najik pole aaglagi huda hamro sewa abharuddha vayeko cha ra sewa sucharu huna aanumanit [ETR] lagne jankari garaudachau.",
+        np_without: "{{LOCATION}} najik pole aaglagi huda hamro sewa abharuddha vayeko cha. NEA ko Kaam paschaat hamro kaam suru hune jankari garaudachau.",
+        en_without: "We are out of service at your area due to Fire on a pole near {{LOCATION}}. We will act for recovery only after NEA complete their work. We will update you again soon on the service status and estimated recovery time. \nWe apologize for the inconvenience."
+      },
+      "Road expansion": {
+        np_with: "{{LOCATION}} najik baato badhaune kaam vayiraheko hunale hamro sewa abharuddha vayeko cha. Sewa sucharu huna aanumanit [ETR] lagne jankari gardachau.",
+        np_without: "{{LOCATION}} najik baato badhaune kaam vayiraheko huda sewa abharuddha vayeko cha. Pole jadan ko kaam paschat kaam suru hune jankari garaudachau.",
+        en_without: "We are out of service at your area due to Road expansion near {{LOCATION}}. We will act for recovery once the road expansion work has been completed. We will update you again soon on the service status and estimated recovery time. \nWe apologize for the inconvenience."
+      },
+      "Pole removed by NEA": {
+        np_with: "{{LOCATION}} najik NEA le pole hatayeko hunale hamro sewa abharuddha vayeko cha ra sewa sucharu huna aanumanit [ETR] lagne jankari gardachau.",
+        np_without: "{{LOCATION}} najik NEA le pole hatayeko hunale hamro sewa abharuddha vayeko cha. NEA ko kaam paschaat hamro kaam suru hune jaankari garaudachau.",
+        en_without: "We are out of service at your area due to Pole removal near {{LOCATION}}. We will act for recovery only after NEA complete their work. We will keep you updated on the progress of maintenance. Thank you for your patience."
+      },
+      "Pole removed by NTC": {
+        np_with: "{{LOCATION}} najik NTC le pole hatayeko hunale hamro sewa abharuddha vayeko cha ra sewa sucharu huna aanumanit [ETR] lagne jankari gardachau.",
+        np_without: "{{LOCATION}} najik NTC le pole hatayeko hunale hamro sewa abharuddha vayeko cha. NTC ko kaam paschaat hamro kaam suru hune jaankari garaudachau.",
+        en_without: "We are out of service at your area due to Pole removal near {{LOCATION}}. We will act for recovery only after NTC complete their work. We will keep you updated on the progress of maintenance. Thank you for your patience."
+      },
+      "Fiber Cut by Municipality": {
+        np_with: "{{LOCATION}} najik Nagarpalika le fiber kateko hunale hamro sewa abharudha vayeko cha ra sewa sucharu huna aanumanit [ETR] lagne jankari garaudachau.",
+        np_without: "{{LOCATION}} najik Nagarpalika le fiber kateko hunale hamro sewa abharudha vayeko cha. Nagarpalika ko kaam paschaat hamro kaam hune jankari garaudachau.",
+        en_without: "We are out of service at your area due to Fiber cut by Municipality near {{LOCATION}}. We will act for recovery only after the Municipality completes its task. We will update you again soon on the service status and estimated recovery time. \nWe apologize for the inconvenience."
+      },
+      "Landslide": {
+        np_with: "{{LOCATION}} najik pahiro gayeko hunale hamro sewa abharuddha vairaheko cha ra sewa sucharu huna aanumanit [ETR] lagne jankari garaudachau.",
+        np_without: "{{LOCATION}} najik pahiro gayeko hunale hamro sewa abharudha vayeko cha. Kaam thalani aghi hajur lai purna jankari garaunechau.",
+        en_without: "We are out of service at your area due to landslide near {{LOCATION}}. We are planning to take action for the resolution as soon as possible. We will update you again soon on the service status and estimated recovery time. \nWe apologize for the inconvenience."
+      },
+      "Flood": {
+        np_with: "{{LOCATION}} najik badi le garda hamro sewa abharuddha vairaheko cha ra sewa sucharu huna aanumanit [ETR] lagne jankari garaudachau.",
+        np_without: "{{LOCATION}} najik badi le garda hamro sewa abharudha vayeko cha. Kaam thalani aghi hajur lai purna jankari garaunechau.",
+        en_without: "We are out of service at your area due to flood near {{LOCATION}}. We are planning to take action for the resolution as soon as possible. We will update you again soon on the service status and estimated recovery time. \nWe apologize for the inconvenience."
+      },
+      "Fiber Management by ward": {
+        np_without: "{{LOCATION}} najik Ward dwara fiber kaatiyeko huda sewa abharudha vayeko cha. Ward ko kaam paschaat hamro kaam hune jankari garaudachau.",
+        en_without: "We are out of service at your area due to Fiber management being performed by Ward near {{LOCATION}}. We will act for recovery only after the Municipality completes its task. We will keep you updated on the progress of maintenance. Thank you for your patience."
+      },
+      "Fiber Management by Municipality": {
+        np_without: "{{LOCATION}} najik Nagarpalika dwara fiber kaatiyeko huda sewa abharudha vayeko cha. Nagarpalika ko kaam paschaat hamro kaam hune jankari garaudachau.",
+        en_without: "We are out of service at your area due to Fiber management being performed by Municipality near {{LOCATION}}. We will act for recovery only after the Municipality completes its task. We will keep you updated on the progress of maintenance. Thank you for your patience."
+      },
+      "Others": {
+        np_with: "{{LOCATION}} najik samasya ko karan le hamro sewa abharuddha vayeko cha ra sewa sucharu huna aanumanit [ETR] lagne jankari garaudachau.",
+        np_without: "{{LOCATION}} najik samasya ko karan le hamro sewa abharuddha vayeko cha. Kaam thalani aghi hajur lai purna jankari garaunechau.",
+        en_without: "We are out of service at your area near {{LOCATION}} due to technical issues. We are planning to take action for the resolution as soon as possible. We will update you again soon on the service status and estimated recovery time. W\ne apologize for the inconvenience."
+      },
+      // Special Cases
+      "Rato Machhindranath": {
+        tag: "ETR: Unknown (After Jatra completion)",
+        np_without: "Rato Machindranath Jatra ko karanle tapai ko chhetramaa hamro sewa abharuddha vayeko cha. Jatra sake paschaat hamro kaam suru hune jaankari garaudachau.",
+        en_without: "We are out of service in your area due to Rato Machindranath Jatra. We will act for recovery only after the Jatra. We will update you again on the maintenance progress. \nWe apologize for the inconvenience."
+      },
+      "Seto Machhindranath": {
+        tag: "ETR: Unknown (After Jatra completion)",
+        np_without: "Seto Machindranath Jatra ko karanle tapai ko chhetramaa hamro sewa abharuddha vayeko cha. Jatra sake paschaat hamro kaam suru hune jaankari garaudachau.",
+        en_without: "We are out of service in your area due to Seto Machindranath Jatra. We will act for recovery only after the Jatra. We will update you again on the maintenance progress. \nWe apologize for the inconvenience."
+      },
+      "Technical Issue": {
+        tag: "ETR: Unknown ()",
+        np_without: "Prabidhik samasya ko karan le hamro sewa ko gunastar ma kami aayako ra sudar ko lagi kaam bhairaheko jankari garaudachau.",
+        en_without: "Due to technical issues, there has been a decrease in the quality of our service in your area. We are actively working on resolving the issue and improving the service quality. We will keep you updated on the progress and provide an estimated recovery time soon. \nWe apologize for any inconvenience caused."
+      },
+      
+      // ACK2 template
+      "ACK2": {
+        header: "Fiber Breakage ETR: Tomorrow",
+        np: "Tapaiko chhetrama hamro sewa sampanna garna nasakeykole chyama prarthi chau. Sewa sucharu garne kaam bholi bihana matra hune jaankari garaudachau.",
+        en: "Dear Valued Customer,\n\nWe are still out of service in your area.\nWe will only act for recovery by Tomorrow morning.\nWe will update you again soon on the service status and estimated recovery time. \nWe apologize for the inconvenience.\n\nSincerely,\nCustomer Service Department\nContact no: 9801523051\nWorldLink"
+      }
+    };
+
+    const RAIN_TEMPLATE = {
+      tag: "ETR: Unknown (Due to continuous rainfall in area)",
+      np: "Aadarniya Graahak,\nLagatar Pani pari raheko karanle sewa sucharu garna nasakeko ra mausam anukul vayepaxi matrai kaam hune jankari garaudachhau.",
+      en: `Dear Valued Customer,\n\nWe are still out of service in your area. We are unable to restore our service due to continuous rainfall. We will act for recovery only after rainfall stops. We will update you again.\nWe apologize for the inconvenience.\n\nSincerely,\nCustomer Service Department\nContact no: ${CONTACT}\n${COMPANY}`
+    };
+    
+    const RAIN_MID_TEMPLATE = {
+      tag: "ETR: Unknown (Due to light rainfall)",
+      np: "{location} najik {rfo_np} huda hamro sewa abharuddha vayeko cha. Pani parekole sewa sucharu garna nasakeko jankari garaunechau.",
+      en: `Dear Valued Customer,\n\nWe are still out of service in your area due to {rfo_en} near {location}. We are unable to restore our service due to continuous rainfall. We will act for recovery only after rainfall stops. We will update you again.\nWe apologize for the inconvenience.\n\nSincerely,\nCustomer Service Department\nContact no: ${CONTACT}\n${COMPANY}`
+    };
+
+    const MAINT_TEMPLATE = {
+      np: `Hami bholi [nepali_date] bihana [start_time] dekhi [end_time] samma marmat karya garna lageko huda ukta samayama sewa abharuddha huna sakne agrim suchit gardachau.`,
+      en: `Dear Valued Customer,\n\nWe are going to have maintenance work tomorrow morning [english_date] from [start_time] to [end_time]. Our service might get interrupted during the maintenance period. We will keep you updated on the service status and estimated recovery time. \nWe apologize for the inconvenience.\n\nSincerely,\nCustomer Service Department\nContact no: ${CONTACT}\n${COMPANY}`
+    };
+
+    // ======= Save/Load Functions =======
+    
+    /**
+     * Generate a unique 4-character code
+     */
+    function generateFourDigitCode() {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let code = '';
+      for (let i = 0; i < 4; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return code;
+    }
+    
+    /**
+     * Get all saved templates from localStorage
+     */
+    function getSavedTemplates() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        return saved ? JSON.parse(saved) : [];
+      } catch (e) {
+        console.error('Error loading saved templates:', e);
+        return [];
+      }
+    }
+    
+    /**
+     * Save templates to localStorage
+     */
+    function saveTemplates(templates) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(templates));
+      } catch (e) {
+        console.error('Error saving templates:', e);
+      }
+    }
+    
+    /**
+     * Save the current template state
+     */
+    function saveCurrentTemplate(code) {
+      // Get current form values
+      let rfoValue = '';
+      let locationValue = '';
+      let etrValue = '';
+      let specialRfoValue = '';
+      let specialLocationValue = '';
+      
+      if (activeMode === 'outage') {
+        if (activeOutageSubMode === 'normal') {
+          rfoValue = $('#rfo')?.value || '';
+          locationValue = $('#locationNormal')?.value || '';
+          etrValue = $('#etr')?.value || '';
+        } else if (activeOutageSubMode === 'special') {
+          specialRfoValue = $('#specialRfo')?.value || '';
+          specialLocationValue = $('#locationSpecial')?.value || '';
+        }
+      }
+      
+      // Get maintenance values
+      let mDateEnValue = $('#mDateEn')?.value || '';
+      let mNpDayValue = $('#mNpDay')?.value || '';
+      let mStartHValue = $('#mStartH')?.value || '';
+      let mStartMValue = $('#mStartM')?.value || '';
+      let mStartAPValue = $('#mStartAP')?.value || '';
+      let mEndHValue = $('#mEndH')?.value || '';
+      let mEndMValue = $('#mEndM')?.value || '';
+      let mEndAPValue = $('#mEndAP')?.value || '';
+      
+      const currentState = {
+        // Form values
+        mode: activeMode,
+        outageSubMode: activeOutageSubMode,
+        rainMode: activeRainMode,
+        rfo: rfoValue,
+        specialRfo: specialRfoValue,
+        locationNormal: locationValue,
+        locationSpecial: specialLocationValue,
+        etr: etrValue,
+        // For maintenance mode
+        mDateEn: mDateEnValue,
+        mNpDay: mNpDayValue,
+        mStartH: mStartHValue,
+        mStartM: mStartMValue,
+        mStartAP: mStartAPValue,
+        mEndH: mEndHValue,
+        mEndM: mEndMValue,
+        mEndAP: mEndAPValue,
+        // Generated content
+        generatedContent: getCurrentGeneratedContent(),
+        timestamp: Date.now(),
+        code: code.toUpperCase(),
+        expiresAt: Date.now() + (8 * 60 * 60 * 1000) // 8 hours from now
+      };
+      
+      const savedTemplates = getSavedTemplates();
+      
+      // Check if code already exists
+      const existingIndex = savedTemplates.findIndex(t => t.code === code.toUpperCase());
+      if (existingIndex !== -1) {
+        // Replace existing template with same code
+        savedTemplates[existingIndex] = currentState;
+      } else {
+        // Add as new template
+        savedTemplates.push(currentState);
+      }
+      
+      saveTemplates(savedTemplates);
+      
+      return currentState;
+    }
+    
+    /**
+     * Get current generated content
+     */
+    function getCurrentGeneratedContent() {
+      const sections = $$('#outBodies .out-section');
+      const content = [];
+      
+      sections.forEach(section => {
+        const title = section.querySelector('h3')?.textContent || '';
+        const text = section.querySelector('.text')?.textContent || '';
+        if (title && text) {
+          content.push({ title, text });
+        }
+      });
+      
+      return content;
+    }
+    
+    /**
+     * Load a saved template
+     */
+    function loadTemplate(template) {
+      // First set the mode
+      setMode(template.mode);
+      
+      // Give time for forms to render, then set values
+      setTimeout(() => {
+        // Set the mode-specific values
+        if (template.mode === 'outage') {
+          // Set the sub-mode first
+          if (template.outageSubMode) {
+            setOutageSubMode(template.outageSubMode);
+          }
+          
+          // Give a bit more time for the forms to update
+          setTimeout(() => {
+            if (template.outageSubMode === 'normal') {
+              if (template.rfo && $('#rfo')) $('#rfo').value = template.rfo;
+              if (template.locationNormal && $('#locationNormal')) $('#locationNormal').value = template.locationNormal;
+              if (template.etr && $('#etr')) $('#etr').value = template.etr;
+              if (template.rainMode) setRainMode(template.rainMode);
+            } else if (template.outageSubMode === 'special') {
+              if (template.specialRfo && $('#specialRfo')) $('#specialRfo').value = template.specialRfo;
+              if (template.locationSpecial && $('#locationSpecial')) $('#locationSpecial').value = template.locationSpecial;
+            }
+            
+            // Generate the output
+            generate();
+          }, 100);
+        } else {
+          // Maintenance mode - set values directly
+          if (template.mDateEn && $('#mDateEn')) $('#mDateEn').value = template.mDateEn;
+          if (template.mNpDay && $('#mNpDay')) $('#mNpDay').value = template.mNpDay;
+          if (template.mStartH && $('#mStartH')) $('#mStartH').value = template.mStartH;
+          if (template.mStartM && $('#mStartM')) $('#mStartM').value = template.mStartM;
+          if (template.mStartAP && $('#mStartAP')) $('#mStartAP').value = template.mStartAP;
+          if (template.mEndH && $('#mEndH')) $('#mEndH').value = template.mEndH;
+          if (template.mEndM && $('#mEndM')) $('#mEndM').value = template.mEndM;
+          if (template.mEndAP && $('#mEndAP')) $('#mEndAP').value = template.mEndAP;
+          
+          // Generate the output
+          generate();
+        }
+        
+        closeLoadModal();
+      }, 150);
+    }
+    
+    /**
+     * Clear all saved templates
+     */
+    function clearAllSavedTemplates() {
+      if (confirm('Are you sure you want to clear ALL saved templates?')) {
+        localStorage.removeItem(STORAGE_KEY);
+        loadSavedTemplatesList();
+        alert('All saved templates have been cleared.');
+      }
+    }
+    
+    /**
+     * Format time for display
+     */
+    function formatTime(timestamp) {
+      const date = new Date(timestamp);
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    
+    /**
+     * Format date for display
+     */
+    function formatDate(timestamp) {
+      const date = new Date(timestamp);
+      return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    }
+    
+    /**
+     * Get time remaining until expiration
+     */
+    function getTimeRemaining(expiresAt) {
+      const now = Date.now();
+      const remaining = expiresAt - now;
+      
+      if (remaining <= 0) return 'Expired';
+      
+      const hours = Math.floor(remaining / (1000 * 60 * 60));
+      const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+      
+      if (hours > 0) {
+        return `${hours}h ${minutes}m remaining`;
+      } else {
+        return `${minutes}m remaining`;
+      }
+    }
+    
+    /**
+     * Open save modal
+     */
+    function openSaveModal() {
+      const modal = $('#saveModal');
+      const input = $('#saveCodeInput');
+      
+      // Generate a suggested code
+      input.value = generateFourDigitCode();
+      modal.classList.remove('hidden');
+      input.focus();
+      input.select();
+      
+      // Add enter key support
+      input.onkeydown = function(e) {
+        if (e.key === 'Enter') {
+          saveTemplate();
+        }
+      };
+    }
+    
+    /**
+     * Close save modal
+     */
+    function closeSaveModal() {
+      $('#saveModal').classList.add('hidden');
+      const input = $('#saveCodeInput');
+      input.value = '';
+      input.onkeydown = null;
+    }
+    
+    /**
+     * Open load modal
+     */
+    function openLoadModal() {
+      const modal = $('#loadModal');
+      modal.classList.remove('hidden');
+      loadSavedTemplatesList();
+    }
+    
+    /**
+     * Close load modal
+     */
+    function closeLoadModal() {
+      $('#loadModal').classList.add('hidden');
+    }
+    
+    /**
+     * Load and display saved templates list
+     */
+    function loadSavedTemplatesList() {
+      const container = $('#savedItemsList');
+      const savedTemplates = getSavedTemplates();
+      const now = Date.now();
+      
+      // Clear expired templates on load
+      const validTemplates = savedTemplates.filter(template => template.expiresAt > now);
+      if (validTemplates.length < savedTemplates.length) {
+        saveTemplates(validTemplates);
+      }
+      
+      if (validTemplates.length === 0) {
+        container.innerHTML = '<div class="no-saved-items">No saved templates found</div>';
+        return;
+      }
+      
+      // Sort by most recent first
+      validTemplates.sort((a, b) => b.timestamp - a.timestamp);
+      
+      let html = '';
+      
+      validTemplates.forEach((template, index) => {
+        const timeRemaining = getTimeRemaining(template.expiresAt);
+        const modeText = template.mode === 'outage' ? 'Outage' : 'Maintenance';
+        
+        // Get a preview of the content
+        let contentPreview = '';
+        if (template.generatedContent && template.generatedContent.length > 0) {
+          const firstContent = template.generatedContent[0].text || '';
+          contentPreview = firstContent.substring(0, 60) + (firstContent.length > 60 ? '...' : '');
+        } else if (template.rfo || template.specialRfo) {
+          const rfo = template.rfo || template.specialRfo || '';
+          const location = template.locationNormal || template.locationSpecial || '';
+          contentPreview = rfo + (location ? ' - ' + location : '');
+        }
+        
+        html += `
+          <div class="saved-item" onclick="loadTemplateByCode('${template.code}')">
+            <div class="saved-item-header">
+              <div class="saved-item-code">${template.code}</div>
+              <div class="saved-item-time">${formatDate(template.timestamp)} ${formatTime(template.timestamp)}</div>
+            </div>
+            <div class="saved-item-content" title="${contentPreview}">
+              ${modeText} - ${contentPreview}
+            </div>
+            <div class="saved-item-meta">
+              <span style="color: var(--ok);">${timeRemaining}</span>
+            </div>
+          </div>
+        `;
+      });
+      
+      container.innerHTML = html;
+    }
+    
+    /**
+     * Load template by code
+     */
+    function loadTemplateByCode(code) {
+      const savedTemplates = getSavedTemplates();
+      const template = savedTemplates.find(t => t.code === code);
+      
+      if (template) {
+        const now = Date.now();
+        
+        if (template.expiresAt <= now) {
+          alert('This template has expired and cannot be loaded.');
+          loadSavedTemplatesList(); // Refresh the list
+          return;
+        }
+        
+        loadTemplate(template);
+      } else {
+        alert('Template not found. It may have expired or been deleted.');
+        loadSavedTemplatesList(); // Refresh the list
+      }
+    }
+    
+    /**
+     * Save template with code
+     */
+    function saveTemplate() {
+      const input = $('#saveCodeInput');
+      let code = input.value.trim().toUpperCase();
+      
+      if (!code || code.length !== 4) {
+        alert('Please enter a 4-digit code (letters or numbers)');
+        input.focus();
+        return;
+      }
+      
+      // Validate code is alphanumeric
+      if (!/^[A-Z0-9]{4}$/.test(code)) {
+        alert('Code must contain only letters and numbers (A-Z, 0-9)');
+        input.focus();
+        return;
+      }
+      
+      // Check if we have any content to save
+      const content = getCurrentGeneratedContent();
+      if (content.length === 0) {
+        alert('Please generate a template first before saving.');
+        return;
+      }
+      
+      // Save the template
+      const savedTemplate = saveCurrentTemplate(code);
+      
+      // Show success message
+      alert(`Template saved with code: ${code}\n\nExpires in 8 hours`);
+      
+      // Close modal
+      closeSaveModal();
+    }
+
+    // ======= Original Utilities =======
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => document.querySelectorAll(sel);
+    const el = (tag, props = {}, children = []) => {
+      const n = document.createElement(tag);
+      Object.entries(props).forEach(([k,v]) => {
+        if (k === 'class') n.className = v; else if (k === 'text') n.textContent = v; else if (k.startsWith('on')) n.addEventListener(k.slice(2), v); else if (k === 'html') n.innerHTML = v; else n.setAttribute(k,v);
+      });
+      
+      const childrenArr = Array.isArray(children) ? children : [children];
+      childrenArr.forEach(child => {
+        if (child === null || child === undefined) return;
+        if (typeof child === 'string' || typeof child === 'number') {
+          n.appendChild(document.createTextNode(child));
+        } else {
+          n.appendChild(child);
+        }
+      });
+      
+      return n;
+    };
+
+    function copy(id) {
+      const textToCopy = $(id).innerText;
+      const tempTextArea = document.createElement('textarea');
+      tempTextArea.value = textToCopy;
+      tempTextArea.style.position = 'fixed';
+      tempTextArea.style.left = '-9999px';
+      document.body.appendChild(tempTextArea);
+      tempTextArea.select();
+      
+      try {
+        const success = document.execCommand('copy');
+        if (success) {
+          const btn = document.querySelector(`[data-copy='${id}']`);
+          if (btn) {
+            const originalText = btn.textContent;
+            btn.textContent = 'Copied!';
+            setTimeout(() => {
+              btn.textContent = originalText;
+            }, 1200);
+          }
+        } else {
+          console.error('Copy command was unsuccessful.');
+        }
+      } catch (err) {
+        console.error('Failed to copy text:', err);
+      } finally {
+        document.body.removeChild(tempTextArea);
+      }
+    }
+
+    function two(n){ return String(n).padStart(2,'0'); }
+
+    function validateTwoDigit(input){
+      input.value = input.value.replace(/\D/g,'').slice(0,2);
+    }
+    
+    function toTitleCase(str) {
+      return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    }
+    
+    function handleLocationInput(event) {
+        generate();
+    }
+
+    function charCountWithSignature(text){
+      let length = text.length;
+      const canFull = length + 10 < 160;
+      const sig = canFull ? "\n-WorldLink" : "\n-WLink";
+      return { length: length + sig.length, sig };
+    }
+    
+    function trimToWords(str, count) {
+      if (!str) return '';
+      const words = str.split(/\s+/).filter(w => w.length > 0);
+      return words.slice(0, count).join(' ');
+    }
+
+    function maintenanceHeader(dateStr, from, to){
+      return `Maintenance Work [${dateStr} from ${from} to ${to}]`;
+    }
+    
+    function getCompletionEntity(rfo) {
+        if (rfo.includes('NEA')) return 'NEA';
+        if (rfo.includes('NTC')) return 'NTC';
+        if (rfo.includes('Road expansion')) return 'NEA';
+        if (rfo.includes('Machhindranath')) return 'After Jatra completion';
+        if (rfo.includes('Pole')) return 'NEA';
+        if (rfo.includes('Landslide')) return 'NEA';
+        if (rfo.includes('Flood')) return 'NEA';
+        if (rfo.includes('Circuit')) return 'NEA';
+        if (rfo.includes('ward')) return 'Ward';
+        if (rfo.includes('Burn')) return 'NEA';
+        if (rfo.includes('Municipality')) return 'Municipality';
+        return 'Authority';
+    }
+
+    // ======= Forms =======
+    function buildOutageForm() {
+      const formContainer = $('#forms');
+      formContainer.innerHTML = '';
+      
+      const subModeControl = el('div', { class: 'segmented-control', role: 'tablist' }, [
+        el('button', { id: 'modeOutageNormal', class: 'active', onclick: () => setOutageSubMode('normal') }, 'Normal Outage'),
+        el('button', { id: 'modeOutageSpecial', onclick: () => setOutageSubMode('special') }, 'Special Cases'),
+        el('button', { id: 'modeAck2', onclick: () => setOutageSubMode('ack2') }, 'ACK2')
+      ]);
+      
+      formContainer.appendChild(subModeControl);
+
+      const outageForms = el('div', { id: 'outageForms' });
+      
+      // Normal Outage Form
+      const normalForm = el('div', { id: 'outageNormalForm', class: 'grid' });
+      const rfoSel = el('select', { class: 'input', id: 'rfo', onchange: generate });
+      rfoSel.appendChild(el('option', { value: '', text: 'Select RFO' }));
+      normalRfoList.forEach(k => rfoSel.appendChild(el('option', { value: k, text: k })));
+
+      const etr = el('select', { class: 'input', id: 'etr', onchange: generate });
+      etr.appendChild(el('option', { value: '', text: 'ETR (No ETR)' }));
+      ['1 hour', '2 hours', '3 hours', '4 hours', '5 hours'].forEach(h => etr.appendChild(el('option', { value: h.replace(' hours', ' hrs').replace(' hour', ' hr'), text: h })));
+      
+      const rainModeControl = el('div', { class: 'segmented-control', id: 'rainModeControl' }, [
+        el('button', { id: 'rainOff', onclick: () => setRainMode('off') }, 'Off'),
+        el('button', { id: 'rainMid', onclick: () => setRainMode('mid') }, 'Mid Rain'),
+        el('button', { id: 'rainOn', onclick: () => setRainMode('on') }, 'Full Rain'),
+      ]);
+      
+      normalForm.append(
+        field('Location (Max 15 words in output)', el('input', { class: 'input', id: 'locationNormal', placeholder: 'Enter Location', oninput: handleLocationInput })),
+        el('div', { class:'grid two', id: 'rfoEtcContainer' }, [
+          field('RFO', rfoSel),
+          field('ETR', etr)
+        ]),
+        el('div', { class: 'field' }, [
+          el('label', { text: 'Rain mode'}),
+          rainModeControl
+        ])
+      );
+      
+      outageForms.appendChild(normalForm);
+
+      // Special Case Form
+      const specialForm = el('div', { id: 'outageSpecialForm', class: 'grid hidden' });
+      const specialRfoSel = el('select', { class: 'input', id: 'specialRfo', onchange: generate });
+      specialRfoSel.appendChild(el('option', { value: '', text: 'Select Special RFO' }));
+      specialRfoList.forEach(k => specialRfoSel.appendChild(el('option', { value: k, text: k })));
+      
+      specialForm.append(
+        field('Location (Max 15 words in output)', el('input', { class: 'input', id: 'locationSpecial', placeholder: 'Enter Location', oninput: handleLocationInput })),
+        field('Special RFO', specialRfoSel)
+      );
+      
+      outageForms.appendChild(specialForm);
+      formContainer.appendChild(outageForms);
+      
+      setOutageSubMode('normal');
+    }
+
+    function buildMaintenanceForm(){
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowStr = tomorrow.toISOString().split('T')[0];
+      const defaultNpDay = tomorrow.getDate() - 17;
+
+      const dateEn = el('input', { class: 'input', id: 'mDateEn', type: 'date', onchange: generate, value: tomorrowStr });
+      const npDaySel = el('select', { class: 'input', id: 'mNpDay', onchange: generate });
+      
+      for(let i=1; i<=32; i++){
+        const isDefault = i === defaultNpDay;
+        npDaySel.appendChild(el('option', { value: i, text: i, selected: isDefault}));
+      }
+
+      const start = timePicker('mStart');
+      const end = timePicker('mEnd');
+
+      $('#forms').innerHTML = '';
+      $('#forms').append(
+        el('div', { class:'grid' }, [ 
+          el('div', { class:'grid two' }, [ 
+            field('English Date', dateEn), 
+            field('Nepali Date (Day)', npDaySel)
+          ]),
+          el('div', { class:'grid two' }, [ 
+            field('Start Time', start.wrap), 
+            field('End Time', end.wrap) 
+          ])
+        ])
+      );
+    }
+
+    function field(labelText, control){
+      const wrapper = el('div', { class: 'field' });
+      wrapper.appendChild(el('label', { text: labelText }));
+      wrapper.appendChild(control);
+      return wrapper;
+    }
+
+    function timePicker(id){
+      const hh = el('select', { class:'input', id: id+'H', onchange: generate }, Array.from({length:12}, (_,i)=> el('option', { value: two(i+1), text: two(i+1) })));
+      const mm = el('select', { class: 'input', id: id+'M', onchange: generate }, ['00','15','30','45'].map(m=> el('option', { value: m, text: m })) );
+      const ap = el('select', { class: 'input', id: id+'AP', onchange: generate }, ['AM','PM'].map(x=> el('option', { value: x, text: x })) );
+      const wrap = el('div', { class:'time-group' }, [hh, mm, ap]);
+      return { hh, mm, ap, wrap };
+    }
+
+    // ======= Outputs =======
+    function setOutputs(configs){
+      const bodies = $('#outBodies');
+      bodies.innerHTML = '';
+      configs.forEach((config, i) => {
+        const isNepali = config.title === 'Nepali';
+        const isHeader = config.title === 'Header';
+        const outSection = el('div', { class: 'out-section' }, [
+          el('div', { class: `out-header ${isNepali ? 'np' : isHeader ? 'centered' : ''}` }, [
+            el('h3', { text: config.title }),
+            isNepali && config.charCount ? el('div', { class: `count${config.charCount.length > 160 ? ' warn' : ''}`, text: `Characters: ${config.charCount.length}/160` }) : null,
+            el('button', { class: 'copy-btn', ['data-copy']: `#text${i}`, onclick: () => copy(`#text${i}`) }, 'Copy')
+          ]),
+          el('pre', { class: 'text', id: `text${i}`, text: config.text }),
+        ]);
+        bodies.appendChild(outSection);
+      });
+    }
+
+    // ======= Generator =======
+    function fmtTime(prefix){
+      const H = $('#'+prefix+'H')?.value;
+      const M = $('#'+prefix+'M')?.value;
+      const AP = $('#'+prefix+'AP')?.value;
+      return H && M ? `${H}:${M} ${AP}` : '';
+    }
+
+    function fmtEngDate(id){
+      const raw = $(id)?.value; if(!raw) return '';
+      const dt = new Date(raw);
+      const day = dt.getDate();
+      const month = dt.toLocaleString('default', { month: 'short' });
+      const suffix = (d=> d%10===1 && d!==11 ? 'st' : d%10===2 && d!==12 ? 'nd' : d%10===3 && d!==13 ? 'rd' : 'th')(day);
+      return `${day}${suffix} ${month}`;
+    }
+    
+    function generateOutage() {
+      if (activeOutageSubMode === 'ack2') {
+        const T = OUTAGE_TEMPLATES['ACK2'];
+        const nepaliText = T.np;
+        const cc = charCountWithSignature(nepaliText);
+        const englishText = T.en;
+        
+        $('#previewLabel').textContent = 'Outage (ACK2)';
+        setOutputs([
+          { title: 'Header', text: T.header },
+          { title: 'Nepali', text: nepaliText + cc.sig, charCount: cc },
+          { title: 'English', text: englishText }
+        ]);
+        return;
+      }
+      
+      const selectedRfo = $('#rfo')?.value || '';
+      const rawLoc = $('#locationNormal')?.value?.trim() || '';
+      const trimmedLoc = trimToWords(toTitleCase(rawLoc), 15);
+      
+      if (activeRainMode !== 'off') {
+        if (activeRainMode === 'mid') {
+            if (!selectedRfo || !trimmedLoc) {
+                setOutputs([{ title: 'Please select RFO and enter a location to generate rain mode messages.', text: 'No message generated.' }]);
+                return;
+            }
+            const headerText = `${selectedRfo} near ${trimmedLoc} ETR: Unknown (Due to rainfall)`;
+            const rfoNp = RFO_NEPALI_MAPPING[selectedRfo] || toTitleCase(selectedRfo);
+          
+            const npText = RAIN_MID_TEMPLATE.np
+              .replace('{location}', trimmedLoc)
+              .replace('{rfo_np}', rfoNp);
+            const enText = RAIN_MID_TEMPLATE.en
+              .replace('{location}', trimmedLoc)
+              .replace('{rfo_en}', selectedRfo);
+            
+            const npCharCount = charCountWithSignature(npText);
+            $('#previewLabel').textContent = 'Outage (Rain)';
+
+            setOutputs([
+              { title: 'Header', text: headerText },
+              { title: 'Nepali', text: npText + npCharCount.sig, charCount: npCharCount },
+              { title: 'English', text: enText }
+            ]);
+        } else if (activeRainMode === 'on') {
+          const headerRfo = selectedRfo || 'Fiber breakage';
+          const headerLocation = trimmedLoc ? ` near ${trimmedLoc}` : '';
+          
+          const headerText = `${headerRfo}${headerLocation} ETR: Unknown (Due to Continuous Rainfall)`.trim();
+          
+          const npText = RAIN_TEMPLATE.np;
+          const enText = RAIN_TEMPLATE.en;
+          
+          const npCharCount = charCountWithSignature(npText);
+          $('#previewLabel').textContent = 'Outage (On Rain)';
+
+          setOutputs([
+            { title: 'Header', text: headerText },
+            { title: 'Nepali', text: npText + npCharCount.sig, charCount: npCharCount },
+            { title: 'English', text: enText }
+          ]);
+        }
+        return;
+      }
+      
+      if (activeOutageSubMode === 'normal') {
+        const etr = $('#etr')?.value || '';
+        
+        if (!selectedRfo || !trimmedLoc) {
+          setOutputs([{ title: 'Please select RFO and location', text: 'Please enter a location and select RFO to generate templates.' }]);
+          return;
+        }
+        
+        const T = OUTAGE_TEMPLATES[selectedRfo] || OUTAGE_TEMPLATES['Others'];
+        const isNormalWithEtr = T.hasOwnProperty('np_with');
+        const hasEtr = etr !== '' && isNormalWithEtr;
+
+        if (hasEtr) {
+          const nepaliText = T.np_with.replace('{{LOCATION}}', trimmedLoc).replace('[ETR]', etr);
+          const cc = charCountWithSignature(nepaliText);
+          
+          setOutputs([
+            { title: 'Nepali', text: nepaliText + cc.sig, charCount: cc }
+          ]);
+        } else {
+          const nepaliText = T.np_without.replace('{{LOCATION}}', trimmedLoc);
+          const cc = charCountWithSignature(nepaliText);
+          const englishText = `Dear Valued Customer,\n\n${T.en_without.replace('{{LOCATION}}', trimmedLoc)}\n\nSincerely,\nCustomer Service Department\nContact no: ${CONTACT}\n${COMPANY}`;
+          const entity = getCompletionEntity(selectedRfo);
+          
+          let headerText = `${selectedRfo} near ${trimmedLoc} ETR: Unknown (After ${entity} task completion)`;
+          $('#previewLabel').textContent = `Outage (${selectedRfo})`;
+
+          setOutputs([
+            { title: 'Header', text: headerText },
+            { title: 'Nepali', text: nepaliText + cc.sig, charCount: cc },
+            { title: 'English', text: englishText }
+          ]);
+        }
+
+      } else {
+        const selectedRfo = $('#specialRfo')?.value || '';
+        const rawLoc = $('#locationSpecial')?.value?.trim() || '';
+        const trimmedLoc = trimToWords(toTitleCase(rawLoc), 15);
+        
+        if (!selectedRfo) {
+          setOutputs([{ title: 'Please select a special case', text: 'Please select a special case to generate templates.' }]);
+          return;
+        }
+
+        const T = OUTAGE_TEMPLATES[selectedRfo];
+        
+        const nepaliText = T.np_without.replace('{{LOCATION}} najik', '');
+        const cc = charCountWithSignature(nepaliText);
+        
+        const englishText = `Dear Valued Customer,\n\n${T.en_without.replace(' near {{LOCATION}}', '')}\n\nSincerely,\nCustomer Service Department\nContact no: ${CONTACT}\n${COMPANY}`;
+        
+        let headerText = `${selectedRfo}`;
+        if (trimmedLoc) {
+            headerText += ` near ${trimmedLoc}`;
+        }
+        if (T.tag) {
+            headerText += ` ${T.tag}`;
+        }
+
+        $('#previewLabel').textContent = `Outage (${selectedRfo})`;
+
+        setOutputs([
+          { title: 'Header', text: headerText },
+          { title: 'Nepali', text: nepaliText + cc.sig, charCount: cc },
+          { title: 'English', text: englishText }
+        ]);
+      }
+    }
+
+    function generateMaintenance() {
+      const d = fmtEngDate('#mDateEn');
+      const start = fmtTime('mStart');
+      const end = fmtTime('mEnd');
+      const header = maintenanceHeader(d || '[Date]', start, end);
+      const mNpD = $('#mNpDay')?.value || '';
+      const nepDay = mNpD ? `${parseInt(mNpD,10)} Gate` : '1 Gate';
+
+      $('#previewLabel').textContent = 'Maintenance';
+      
+      const np = MAINT_TEMPLATE.np.replace('[nepali_date]', nepDay).replace('[start_time]', start).replace('[end_time]', end);
+      const en = MAINT_TEMPLATE.en.replace('[english_date]', d || '[date]').replace('[start_time]', start).replace('[end_time]', end);
+      const npCharCount = charCountWithSignature(np);
+
+      setOutputs([
+        { title: 'Header', text: header },
+        { title: 'Nepali', text: np + npCharCount.sig, charCount: npCharCount },
+        { title: 'English', text: en }
+      ]);
+    }
+    
+    function generate() {
+      const rfoEtcContainer = $('#rfoEtcContainer');
+      const etrField = $('#etr')?.parentNode;
+      if (rfoEtcContainer && etrField) {
+        if (activeRainMode === 'off' && activeOutageSubMode === 'normal') {
+            etrField.classList.remove('hidden');
+            rfoEtcContainer.classList.add('two');
+        } else {
+            etrField.classList.add('hidden');
+            rfoEtcContainer.classList.remove('two');
+        }
+      }
+
+      if (activeMode === 'outage') {
+        generateOutage();
+      } else {
+        generateMaintenance();
+      }
+    }
+
+    function clearNormalOutageFields() {
+      const locationInput = $('#locationNormal');
+      const rfoSelect = $('#rfo');
+      const etrSelect = $('#etr');
+      
+      if (locationInput) locationInput.value = '';
+      if (rfoSelect) rfoSelect.value = '';
+      if (etrSelect) etrSelect.value = '';
+      
+      activeRainMode = 'off';
+    }
+
+    function updateOutageFormVisibility() {
+      const normalForm = $('#outageNormalForm');
+      const specialForm = $('#outageSpecialForm');
+      
+      if (activeOutageSubMode === 'normal') {
+        normalForm.classList.remove('hidden');
+        specialForm.classList.add('hidden');
+      } else if (activeOutageSubMode === 'special') {
+        normalForm.classList.add('hidden');
+        specialForm.classList.remove('hidden');
+      } else if (activeOutageSubMode === 'ack2') {
+        normalForm.classList.add('hidden');
+        specialForm.classList.add('hidden');
+      }
+      
+      const rainModeControl = $('#rainModeControl');
+      if (rainModeControl) {
+        const rainModeButtons = rainModeControl.querySelectorAll('button');
+        rainModeButtons.forEach(btn => btn.classList.remove('active'));
+        const activeBtn = $(`#rain${activeRainMode.charAt(0).toUpperCase() + activeRainMode.slice(1)}`);
+        if (activeBtn) {
+          activeBtn.classList.add('active');
+        }
+      }
+      
+      const outageSubModeControl = $('#forms').querySelector('.segmented-control');
+      if (outageSubModeControl) {
+        const outageSubModeButtons = outageSubModeControl.querySelectorAll('button');
+        outageSubModeButtons.forEach(btn => btn.classList.remove('active'));
+        if (activeOutageSubMode === 'normal') {
+          $('#modeOutageNormal').classList.add('active');
+        } else if (activeOutageSubMode === 'special') {
+          $('#modeOutageSpecial').classList.add('active');
+        } else if (activeOutageSubMode === 'ack2') {
+          $('#modeAck2').classList.add('active');
+        }
+      }
+
+      generate();
+    }
+    
+    function setRainMode(mode) {
+      activeRainMode = mode;
+      updateOutageFormVisibility();
+    }
+    
+    function setOutageSubMode(mode) {
+      if (activeOutageSubMode !== mode) {
+        if (mode === 'special' || mode === 'ack2') {
+          clearNormalOutageFields();
+        }
+        activeOutageSubMode = mode;
+        updateOutageFormVisibility();
+      }
+    }
+
+    // ======= Mode =======
+    function setMode(mode){
+      activeMode = mode;
+      $('#modeOutage').classList.toggle('active', mode==='outage');
+      $('#modeMaintenance').classList.toggle('active', mode==='maintenance');
+
+      const calendarCard = $('#nepaliCalendarCard');
+      
+      if (mode === 'outage') {
+        buildOutageForm();
+        if (calendarCard) {
+          calendarCard.classList.add('hidden');
+        }
+      } else {
+        buildMaintenanceForm();
+        if (calendarCard) {
+          calendarCard.classList.remove('hidden');
+        }
+      }
+      
+      generate();
+      window.location.hash = mode;
+    }
+
+    // ======= Misc =======
+    function clearAll(){
+      document.querySelectorAll('input, select, textarea').forEach(i=>{
+        if (i.type==='checkbox') i.checked = false; else i.value = '';
+      });
+      generate();
+      setDefaults();
+    }
+
+    function fromHash(){
+      const h = (location.hash||'').replace('#','');
+      if (h==='outage' || h==='maintenance') setMode(h); else setMode('outage');
+    }
+
+    function setDefaults() {
+      $$('select[id$="H"]').forEach(el => el.value = '03');
+      $$('select[id$="M"]').forEach(el => el.value = '00');
+      $$('select[id$="AP"]').forEach(el => el.value = 'AM');
+    }
+
+    window.onload = function() {
+      fromHash();
+      setDefaults();
+      generate();
+      initNotepad(); // Initialize notepad
+    };
+
+    document.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'F12' || e.code === 'F12') {
+        e.preventDefault();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.code === 'KeyI')) {
+        e.preventDefault();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'J' || e.code === 'KeyJ')) {
+        e.preventDefault();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'C' || e.code === 'KeyC')) {
+        e.preventDefault();
+      }
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'U' || e.code === 'KeyU')) {
+        e.preventDefault();
+      }
+    });
+
+  </script>
+
+
+<script>
+    window.addEventListener("pageshow", function (event) {
+        if (event.persisted) {
+        window.location.reload();
+        }
+    });
+</script>
+
+
+
+</body>
+</html>

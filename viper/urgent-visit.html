@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Urgent Support · Viber Share + Branch Phone</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/13802/13802827.png" type="image/icon type">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #0b0f2a;
+      color: #d1d5db;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #1e293b;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background-color: #4b5563;
+      border-radius: 4px;
+      border: 2px solid #1e293b;
+    }
+    .preview-toolbar {
+      position: absolute;
+      top: 0.7rem;
+      right: 0.7rem;
+      display: flex;
+      gap: 0.5rem;
+      z-index: 5;
+    }
+    .action-btn {
+      appearance: none;
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background-color: #2563eb;
+      color: white;
+      transition: 0.15s;
+      cursor: pointer;
+      border: none;
+      font-weight: 500;
+    }
+    .action-btn i {
+      font-size: 0.9rem;
+    }
+    .action-btn:hover {
+      background-color: #1d4ed8;
+    }
+    .viber-btn {
+      background-color: #7360f2;
+    }
+    .viber-btn:hover {
+      background-color: #5f4ce0;
+    }
+    input:focus, select:focus, textarea:focus {
+      box-shadow: 0 0 0 2px #3b82f6, 0 0 0 1px #1e293b;
+      outline: none;
+      background-color: #1e233d;
+    }
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover, 
+    input:-webkit-autofill:focus, 
+    input:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 30px #1e233d inset !important;
+      -webkit-text-fill-color: white !important;
+      caret-color: white;
+    }
+    textarea.auto-resize {
+      min-height: 130px;
+      height: auto;
+      overflow-y: hidden;
+    }
+    .preview-box {
+      transition: box-shadow 0.2s;
+      position: relative;
+    }
+    .preview-box:focus-within {
+      box-shadow: 0 0 0 2px #2563eb30, 0 4px 12px rgba(0,0,0,0.5);
+    }
+    .toast-msg {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e293bdd;
+      backdrop-filter: blur(8px);
+      color: white;
+      padding: 8px 18px;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      z-index: 200;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      opacity: 0;
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+  <div class="flex flex-col lg:flex-row w-full max-w-7xl bg-gradient-to-br from-[#1e233d] to-[#181d38] rounded-2xl shadow-2xl p-6 space-y-6 lg:space-y-0 lg:space-x-6 border border-[#2f3555]">
+
+    <!-- LEFT panel -->
+    <div class="lg:w-1/2 p-6 bg-[#161a31] rounded-xl shadow-inner border border-[#252b44] space-y-6">
+      <h1 class="text-xl md:text-2xl font-bold text-white flex items-center gap-2"><i class="fas fa-pen-alt text-blue-400"></i>Create Urgent Template</h1>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-400 mb-1"><i class="far fa-user mr-1"></i>Username</label>
+        <div class="relative flex items-center">
+          <i class="absolute left-3 text-gray-400 fas fa-user-circle"></i>
+          <input type="text" id="username" placeholder="e.g. bijaya.karn" class="w-full p-3 pl-10 bg-[#1e233d] rounded-lg border border-[#2b304c] text-white" />
+        </div>
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-400 mb-1"><i class="fas fa-phone-alt mr-1"></i>Contact (optional)</label>
+        <div class="relative flex items-center">
+          <i class="absolute left-3 text-gray-400 fas fa-mobile-alt"></i>
+          <input type="tel" id="contact" placeholder="10 digit mobile number" class="w-full p-3 pl-10 bg-[#1e233d] rounded-lg border border-[#2b304c] text-white" />
+        </div>
+        <div id="contact-error" class="mt-1 text-sm text-red-400 hidden"><i class="fas fa-exclamation-triangle mr-1"></i>Enter exactly 10 digits</div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-400 mb-1"><i class="fas fa-tag mr-1"></i>Issue / Case</label>
+        <div class="flex items-center space-x-2">
+          <div class="relative w-1/2">
+            <select id="issue" class="w-full p-3 bg-[#1e233d] rounded-lg border border-[#2b304c] text-white appearance-none pr-8">
+              <option value="" disabled selected>Select issue…</option>
+              <option value="ONU offline issue">ONU offline issue</option>
+              <!-- <option value="Low PL case">Low PL case</option> -->
+              <option value="NETTV installation">NETTV installation</option>
+              <option value="Shifting case">Shifting case</option>
+              <!-- <option value="Manage cable ticket">Manage cable ticket</option> -->
+              <option value="Account Related Ticket">Account Related Ticket</option>
+              <!-- <option value="6G related Ticket">6G package/ONU related issue</option>
+              <option value="Pending Ticket">Pending Ticket</option> -->
+              <option value="Other">Other (Support)</option>
+              <option value="Account Other">Other (Account)</option>
+            </select>
+            <i class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 fas fa-chevron-down pointer-events-none"></i>
+          </div>
+          <input type="text" id="otherIssue" placeholder="Type issue details" class="w-1/2 p-3 bg-[#1e233d] rounded-lg border border-[#2b304c] text-white hidden" />
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-400 mb-1"><i class="fas fa-code-branch mr-1"></i>Select Branch</label>
+        <div class="relative">
+          <select id="branch" class="w-full p-3 bg-[#1e233d] rounded-lg border border-[#2b304c] text-white appearance-none pr-8"></select>
+          <i class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 fas fa-chevron-down pointer-events-none"></i>
+        </div>
+      </div>
+      
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap gap-4">
+          <label class="flex items-center gap-2"><input type="checkbox" id="generateTomorrow" class="rounded bg-[#1e233d] border-[#2b304c]"><span class="text-sm"><i class="far fa-calendar-alt mr-1"></i>Tomorrow</span></label>
+          <label class="flex items-center gap-2"><input type="checkbox" id="generateHold" class="rounded bg-[#1e233d]"><span class="text-sm"><i class="fas fa-pause-circle mr-1"></i>On Hold</span></label>
+          <label class="flex items-center gap-2"><input type="checkbox" id="generatePark" class="rounded bg-[#1e233d]"><span class="text-sm"><i class="fas fa-parking mr-1"></i>Park</span></label>
+        </div>
+        <button id="clearButton" class="px-4 py-1.5 text-sm text-gray-200 bg-gray-700 rounded-full hover:bg-gray-600 transition flex items-center gap-1"><i class="fas fa-eraser"></i> Clear</button>
+      </div>
+    </div>
+
+    <!-- RIGHT panel -->
+    <div class="lg:w-1/2 p-6 bg-[#161a31] rounded-xl shadow-inner border border-[#252b44] space-y-5">
+      <h2 class="text-xl md:text-2xl font-bold text-white flex items-center gap-2"><i class="fas fa-eye text-green-400"></i>Message preview</h2>
+
+      <div id="ticketBox" class="preview-box">
+        <textarea id="ticketOutput" readonly class="w-full p-4 pr-32 bg-[#1e233d] rounded-lg border border-[#2b304c] text-white placeholder-gray-500 focus:outline-none custom-scrollbar resize-none auto-resize text-sm leading-relaxed" placeholder="Fill the form to generate message..."></textarea>
+        <div class="preview-toolbar">
+          <button id="copyButton" class="action-btn"><i class="fas fa-copy"></i> Copy</button>
+          <button id="viberShareBtn" class="action-btn viber-btn"><i class="fab fa-viber"></i> Viber</button>
+        </div>
+      </div>
+
+      <div id="supervisorInfo" class="mt-2 p-4 bg-[#1a1f3a] rounded-lg border border-[#2f3a5a] hidden">
+        <div class="flex items-center gap-3">
+          <i class="fas fa-user-tie text-yellow-400 text-xl"></i>
+          <span id="positionLabel" class="text-gray-300 text-sm font-medium"></span>
+          <span id="supervisorName" class="text-base font-bold text-yellow-300 bg-yellow-900/30 px-3 py-1 rounded-full border border-yellow-700/50 inline-flex items-center gap-1"><i class="fas fa-star text-xs"></i> </span>
+        </div>
+        <p class="text-xs text-gray-400 mt-2 italic flex items-center gap-1"><i class="fas fa-info-circle"></i> Details pulled from ViPeR Data. Contact person may be wrong or no longer in the branch.</p>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- branch.js (external data) -->
+  <script src="https://urgent.bjkarn.com.np/branch.js"></script>
+
+  <script>
+    (function() {
+      // ========== PROTECTION ==========
+      document.addEventListener('contextmenu', e => e.preventDefault());
+      const blockedDevKeys = ['F12', 'I', 'J', 'C', 'K', 'E', 'S', 'U'];
+      document.addEventListener('keydown', e => {
+        if (e.key === 'F12') { e.preventDefault(); return; }
+        if (e.ctrlKey && e.shiftKey && blockedDevKeys.includes(e.key)) { e.preventDefault(); return; }
+        if (e.ctrlKey && e.key === 'U') { e.preventDefault(); return; }
+        if (e.metaKey && e.altKey && blockedDevKeys.includes(e.key)) { e.preventDefault(); return; }
+        if (e.metaKey && e.key === 'U') { e.preventDefault(); return; }
+        if (e.metaKey && e.shiftKey && e.key === 'C') { e.preventDefault(); return; }
+      });
+
+      // ========== DOM elements ==========
+      const usernameInput = document.getElementById('username');
+      const contactInput = document.getElementById('contact');
+      const contactError = document.getElementById('contact-error');
+      const issueInput = document.getElementById('issue');
+      const otherIssueInput = document.getElementById('otherIssue');
+      const branchInput = document.getElementById('branch');
+      const ticketOutput = document.getElementById('ticketOutput');
+      const chkTomorrow = document.getElementById('generateTomorrow');
+      const chkHold = document.getElementById('generateHold');
+      const chkPark = document.getElementById('generatePark');
+      const clearBtn = document.getElementById('clearButton');
+      const copyBtn = document.getElementById('copyButton');
+      const viberBtn = document.getElementById('viberShareBtn');
+      const supervisorDiv = document.getElementById('supervisorInfo');
+      const supervisorSpan = document.getElementById('supervisorName');
+      const positionLabel = document.getElementById('positionLabel');
+
+      // ========== Data from branch.js ==========
+      const externalData = window.branchData || [];
+      const branchSupervisorMap = new Map();   // branch -> contact name
+      const branchPositionMap = new Map();     // branch -> position
+      const branchPhoneMap = new Map();        // branch -> phone number (from branch.js)
+
+      externalData.forEach(item => {
+        if (item.branch && item.contact) branchSupervisorMap.set(item.branch, item.contact);
+        if (item.branch && item.position) branchPositionMap.set(item.branch, item.position);
+        // IMPORTANT: match the field name used in your branch.js
+        // If your file uses "phone" or "contactNumber" or "branchPhone", change accordingly.
+        // Here we assume field name "phone" exists. If missing, no @phone mention.
+        if (item.branch && item.phone) branchPhoneMap.set(item.branch, item.phone);
+      });
+
+      // Helper functions
+      function getSupervisorForBranch(branch) {
+        return branchSupervisorMap.get(branch) || 'Supervisor not assigned';
+      }
+      function getPositionForBranch(branch) {
+        return branchPositionMap.get(branch) || 'Supervisor';
+      }
+      function getPhoneForBranch(branch) {
+        return branchPhoneMap.get(branch) || '';
+      }
+
+      // Populate branch dropdown
+      function populateBranches() {
+        branchInput.innerHTML = '<option value="" disabled selected>Select a branch…</option>';
+        const branches = [...branchSupervisorMap.keys()].sort();
+        branches.forEach(branch => {
+          const opt = document.createElement('option');
+          opt.value = branch;
+          opt.textContent = branch;
+          branchInput.appendChild(opt);
+        });
+        if (branches.length === 0) {
+          branchInput.innerHTML = '<option disabled>No branch data available</option>';
+        }
+        validateContactAndMessage();
+      }
+
+      // Resize textarea
+      function resizeTextarea() {
+        ticketOutput.style.height = 'auto';
+        ticketOutput.style.height = ticketOutput.scrollHeight + 'px';
+      }
+
+      // Update the supervisor info box (below preview)
+      function updateSupervisorDisplay() {
+        const selectedBranch = branchInput.value;
+        if (!selectedBranch || !branchSupervisorMap.has(selectedBranch)) {
+          supervisorDiv.classList.add('hidden');
+          return;
+        }
+        const supervisor = getSupervisorForBranch(selectedBranch);
+        const position = getPositionForBranch(selectedBranch);
+        positionLabel.textContent = position + ' :';
+        supervisorSpan.innerHTML = `<i class="fas fa-crown mr-1 text-yellow-300"></i> ${supervisor}`;
+        supervisorDiv.classList.remove('hidden');
+      }
+
+      // Main message generation (includes @position supervisor and @phone)
+      function validateContactAndMessage() {
+        // Validate contact (10 digits)
+        let raw = contactInput.value.replace(/\D/g, '');
+        if (raw.length > 10) raw = raw.slice(-10);
+        contactInput.value = raw;
+        const hasContact = raw.length > 0;
+        const isValidContact = raw.length === 10;
+        contactError.classList.toggle('hidden', !(hasContact && !isValidContact));
+
+        const username = usernameInput.value.trim();
+        const issueVal = issueInput.value;
+        const branch = branchInput.value;
+
+        // If required fields missing or contact invalid, clear preview
+        if (!username || !issueVal || !branch || !branchSupervisorMap.has(branch) || (hasContact && !isValidContact)) {
+          ticketOutput.value = '';
+          resizeTextarea();
+          updateSupervisorDisplay();
+          return;
+        }
+
+        // Determine final issue text and action text
+        let finalIssue, actionText;
+        if (issueVal === 'Other' || issueVal === 'Account Other') {
+          finalIssue = otherIssueInput.value.trim() || 'Other issue';
+          actionText = issueVal === 'Other' ? 'urgent field support' : 'urgent follow up';
+        } else {
+          finalIssue = issueVal;
+          actionText = (finalIssue.includes('Account Related') || finalIssue.includes('6G related'))
+            ? 'urgent follow-up from Branch Account team'
+            : 'urgent field support';
+        }
+
+        const contactLine = (raw && isValidContact) ? `\nCalled number: ${raw}` : '';
+        const tomorrowMsg = chkTomorrow.checked ? 'first hour tomorrow morning ' : '';
+        const holdText = chkHold.checked ? ' (Ticket on Hold)' : '';
+        const parkText = chkPark.checked ? ' (Ticket on Park)' : '';
+
+        // Supervisor mention: @position supervisorName
+        const supervisorName = getSupervisorForBranch(branch);
+        const position = getPositionForBranch(branch);
+        const supervisorMention = (supervisorName && supervisorName !== 'Supervisor not assigned')
+          ? `\n@${position} ${supervisorName}`
+          : '';
+
+        // Branch phone mention: @phone (from branch.js)
+        const branchPhone = getPhoneForBranch(branch);
+        const phoneMention = branchPhone ? `\n@${branchPhone}` : '';
+
+        const output = `Dear ${branch} team,
+Username: ${username}${contactLine}
+Client is requesting ${actionText} ${tomorrowMsg}for ${finalIssue}${holdText}${parkText}.
+Please do needful assistance ASAP.${phoneMention}`;
+
+        ticketOutput.value = output;
+        resizeTextarea();
+        updateSupervisorDisplay();
+      }
+
+      // Copy to clipboard with toast
+      function copyMessage() {
+        const msg = ticketOutput.value.trim();
+        if (!msg) {
+          showToast('Nothing to copy', '#ef4444');
+          return;
+        }
+        ticketOutput.select();
+        document.execCommand('copy');
+        copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        setTimeout(() => { copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy'; }, 1500);
+        showToast('Copied to clipboard', '#2563eb');
+      }
+
+      // Viber share
+      function shareToViber() {
+        const msg = ticketOutput.value.trim();
+        if (!msg) {
+          showToast('No message to share', '#ef4444');
+          return;
+        }
+        const encoded = encodeURIComponent(msg);
+        const viberUrl = `viber://forward?text=${encoded}`;
+        window.location.href = viberUrl;
+        showToast('Opening Viber...', '#7360f2');
+      }
+
+      // Toast helper
+      function showToast(text, bgColor = '#1e293b') {
+        let toast = document.getElementById('dynamic-toast');
+        if (!toast) {
+          toast = document.createElement('div');
+          toast.id = 'dynamic-toast';
+          toast.className = 'toast-msg';
+          document.body.appendChild(toast);
+        }
+        toast.style.backgroundColor = bgColor;
+        toast.innerText = text;
+        toast.style.opacity = '1';
+        setTimeout(() => { toast.style.opacity = '0'; }, 2000);
+      }
+
+      // Clear entire form
+      function clearForm() {
+        usernameInput.value = '';
+        contactInput.value = '';
+        contactError.classList.add('hidden');
+        issueInput.value = '';
+        otherIssueInput.value = '';
+        otherIssueInput.classList.add('hidden');
+        branchInput.value = '';
+        chkTomorrow.checked = false;
+        chkHold.checked = false;
+        chkPark.checked = false;
+        supervisorDiv.classList.add('hidden');
+        ticketOutput.value = '';
+        resizeTextarea();
+      }
+
+      // Logout stub
+      window.handleLogout = function() {
+        window.location.href = '/login';
+      };
+
+      // Attach event listeners
+      usernameInput.addEventListener('input', validateContactAndMessage);
+      contactInput.addEventListener('input', validateContactAndMessage);
+      issueInput.addEventListener('change', () => {
+        const isOther = issueInput.value === 'Other' || issueInput.value === 'Account Other';
+        otherIssueInput.classList.toggle('hidden', !isOther);
+        if (!isOther) otherIssueInput.value = '';
+        validateContactAndMessage();
+      });
+      otherIssueInput.addEventListener('input', validateContactAndMessage);
+      branchInput.addEventListener('change', validateContactAndMessage);
+      chkTomorrow.addEventListener('change', validateContactAndMessage);
+      chkHold.addEventListener('change', validateContactAndMessage);
+      chkPark.addEventListener('change', validateContactAndMessage);
+      clearBtn.addEventListener('click', clearForm);
+      copyBtn.addEventListener('click', copyMessage);
+      viberBtn.addEventListener('click', shareToViber);
+
+      // Initial load
+      window.onload = function() {
+        populateBranches();
+        validateContactAndMessage();
+      };
+    })();
+  </script>
+
+  <!-- bfcache reload -->
+  <script>
+    window.addEventListener("pageshow", function(event) {
+      if (event.persisted) window.location.reload();
+    });
+  </script>
+
+    <script src="/assets/js/security.js"></script>
+
+
+    
+</body>
+</html>

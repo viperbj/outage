@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/906/906175.png" type="image/png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>ViPeR-Branch Details</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: #d0ddea;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+
+        .db-container {
+            width: 100%;
+            max-width: 100%;
+            max-height: max-content;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 35px 60px -18px rgba(0, 10, 30, 0.5),
+                        0 12px 30px -10px rgba(0, 0, 0, 0.35);
+            overflow: hidden;
+            border: 1px solid #d0ddee;
+        }
+
+
+        .db-header {
+            background: #0d2742;
+            color: white;
+            padding: 1.6rem 2.5rem;
+        }
+
+        .db-header h1 {
+            font-weight: 600;
+            font-size: 2rem;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .db-header h1 span {
+            background: #264d7c;
+            padding: 0.3rem 1.3rem;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #e0efff;
+        }
+
+        .db-header .sub {
+            color: #b3cef0;
+            margin-top: 6px;
+            font-size: 1rem;
+        }
+
+        .filter-bar {
+            background: white;
+            padding: 1.2rem 2.5rem;
+            border-bottom: 1px solid #dbe4ef;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem 1.5rem;
+        }
+
+        .filter-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.8rem 1.2rem;
+            flex: 4;
+        }
+
+        .filter-select {
+            background: #f2f7ff;
+            border: 1px solid #c7d8ed;
+            border-radius: 40px;
+            padding: 0.7rem 1.5rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #1c3c62;
+            cursor: pointer;
+            outline: none;
+            min-width: 160px;
+            transition: 0.1s;
+        }
+
+        .filter-select:hover {
+            background: #e8f0fd;
+        }
+
+        .filter-select:disabled {
+            background: #e9edf5;
+            color: #7f98b5;
+            border-color: #c7d8ed;
+            cursor: not-allowed;
+        }
+
+        #branchFilter {
+            min-width: 150px;
+        }
+
+        .search-wrapper {
+            flex: 2;
+            min-width: 400px;
+            display: flex;
+            align-items: center;
+            background: #f2f7ff;
+            border-radius: 60px;
+            padding: 0.2rem 0.2rem 0.2rem 1.5rem;
+            border: 1px solid #c7d8ed;
+            transition: 0.1s;
+        }
+
+        .search-wrapper:focus-within {
+            border-color: #1e4e89;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(26, 77, 140, 0.15);
+        }
+
+        .search-wrapper span {
+            color: #5276a5;
+            margin-right: 8px;
+            font-size: 1.1rem;
+        }
+
+        .search-wrapper input {
+            width: 100%;
+            padding: 0.8rem 0.8rem 0.8rem 0;
+            border: none;
+            background: transparent;
+            font-size: 0.98rem;
+            outline: none;
+        }
+
+        .clear-btn {
+            background: white;
+            border: 1px solid #bfd2e9;
+            border-radius: 40px;
+            padding: 0.6rem 1.8rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1d4068;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: 0.1s;
+        }
+
+        .clear-btn:hover {
+            background: #ebf2fc;
+            border-color: #8fa9cc;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            max-height: 480px;
+            overflow-y: auto;
+            background: white;
+            scrollbar-width: thin;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1200px;
+            white-space: nowrap;
+        }
+
+        th {
+            background: #e2edfb;
+            color: #0d2742;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 1.2rem 1.2rem;
+            text-align: left;
+            border-bottom: 2px solid #c0d3ea;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            padding: 1.1rem 1.2rem;
+            border-bottom: 1px solid #dee9f2;
+            color: #1b3b5e;
+            font-size: 0.98rem;
+            background: white;
+        }
+
+        tr:hover td {
+            background: #f5faff;
+        }
+
+        .region-tag {
+            background: #d2e5ff;
+            color: #0b3670;
+            font-weight: 600;
+            padding: 0.3rem 1.1rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            display: inline-block;
+        }
+
+        .branch-name {
+            font-weight: 600;
+            color: #0f2f50;
+        }
+
+        .olt-list {
+            font-family: 'SF Mono', monospace;
+            background: #ebf3fc;
+            padding: 0.3rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            color: #1d4e8c;
+            display: inline-block;
+        }
+
+        .contact-person {
+            font-weight: 500;
+            color: #122d48;
+        }
+
+        .position {
+            font-size: 0.9rem;
+            color: #3f6490;
+        }
+
+        .contact-number {
+            font-family: monospace;
+            background: #f0f7ff;
+            padding: 0.3rem 1rem;
+            border-radius: 50px;
+            border: 1px solid #c9dcf2;
+            font-size: 0.9rem;
+            display: inline-block;
+        }
+
+        .empty-row {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #6f8db0;
+            font-style: italic;
+        }
+
+        .footer {
+            padding: 1rem 2.5rem 1.2rem;
+            background: #f2f8ff;
+            border-top: 1px solid #cfddea;
+            display: flex;
+            justify-content: space-between;
+            color: #32547c;
+            font-size: 0.9rem;
+        }
+
+        .table-wrapper::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .table-wrapper::-webkit-scrollbar-track {
+            background: #e9f0f7;
+        }
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: #a6bedb;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body>
+    
+<div class="db-container">
+
+
+    <!-- Top Left Icons -->
+    <!-- <div style="position:fixed; top:24px; left:25px; display:flex; gap:10px; z-index:101;">
+
+    <div onclick="goBack()" 
+        style="width:44px;height:44px;background:#0f172a;border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+        <i class="fas fa-arrow-left" style="color:#fff;"></i>
+    </div>
+
+    <div onclick="goHome()" 
+        style="width:44px;height:44px;background:#0f172a;border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+        <i class="fas fa-home" style="color:#fff;"></i>
+    </div>
+
+    </div> -->
+
+    
+    <!-- Center Top Text -->
+        <div style="position:fixed;top:24px;left:50%;transform:translateX(-50%);z-index:101;text-align:center;background:#0f172a;padding:12px 22px;border-radius:14px;color:#fff;box-shadow:0 8px 20px rgba(0,0,0,.2);">
+            
+            <h3 style="margin:0;font-size:16px;font-weight:600;">
+                For Data Correction
+            </h3>
+            <div style="display:flex;gap:16px;justify-content:center;margin-top:10px;">                
+                <a href="https://wa.me/9779801464801" target="_blank"
+                style="filter:drop-shadow(0 0 8px #25D366);">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
+                    alt="WhatsApp" width="32">
+                </a>
+
+                <a href="viber://chat?number=+9779801464801"
+                style="filter:drop-shadow(0 0 8px #665cac);">
+                <img src="/assets/img/viber.png"
+                    alt="Viber" width="32">
+                </a>
+            </div>
+        </div>
+
+    <div class="db-header">
+        <h1>🗺️ Branch Details <span>ViPeR Hub</span></h1>
+    </div>
+
+    <div class="filter-bar">
+        <div class="filter-actions">
+
+            <div class="search-wrapper">
+                <span>🔍</span>
+                <input type="text" id="searchInput" placeholder="Search region, branch, person, position, number..." autocomplete="off">
+                    <span style="font-size: 15px;">Press Ctrl+K</span>
+            </div>
+
+
+            <!-- region dropdown -->
+            <select id="regionFilter" class="filter-select">
+                <option value="all">🌎 Regions</option>
+            </select>
+
+            <!-- branch dropdown (dependent) -->
+            <select id="branchFilter" class="filter-select">
+                <option value="all">🏛️ Branch</option>
+            </select>
+
+            <!-- position dropdown (dependent) -->
+            <select id="positionFilter" class="filter-select">
+                <option value="all">👤 Position</option>
+            </select>
+
+            <button class="clear-btn" id="clearFiltersBtn">✕ clear</button>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table><thead><tr>
+                    <th>REGION</th>
+                    <th>BRANCH NAME</th>
+                    <th>OLT LIST</th>
+                    <th>CONTACT PERSON</th>
+                    <th>POSITION</th>
+                    <th>CONTACT NUMBER</th>
+                </tr></thead>
+            <tbody id="tableBody">
+                <!-- dynamic rows -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer">
+        <span>📋 sample directory — <span id="footerOltCount">0</span> OLTs — <span id="footerBranchCount">0</span> branch</span></span>
+        <span>⚙️ region · branch — ViPeR Hub </span>
+    </div>
+    
+</div>
+
+<script>
+  window.addEventListener("pageshow", function (event) {
+    if (event.persisted) {
+      window.location.reload();
+    }
+  });
+</script>
+  <script src="https://urgent.bjkarn.com.np/branch.js"></script>
+  <script src="/assets/js/security.js"></script>
+
+
+
+
+</body>
+</html>

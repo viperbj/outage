@@ -1,0 +1,13 @@
+/monsheet https://docs.google.com/spreadsheets/d/1RqFlhRPyOlp0Vjn-Z3WG4mxTrSZGAuf-Q5tg81zgUDA/edit 301
+
+
+/sup https://worldlinknepal-my.sharepoint.com/:x:/g/personal/bijaya_karn_worldlink_com_np/IQC2IsG9Rd1lS6FuG5FN_dHFAchPZkhxNVoL-dZ54jjjkcw?e=A6kx3x 301
+
+# 🔐 Dashboard protection (ADD THIS)
+/dashboard/* /dashboard/index.html 200!
+
+
+/*    /index.html   200
+
+/assets/*   /404.html   403!
+/assets/outage/reqdata.js   /404.html   403!

@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>ViPeR Workspace · Unified Dashboard</title>
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/13802/13802827.png" type="image/icon type">
+  <!-- Firebase SDKs (same config as index.html) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <style>
+    /* ========== YOUR EXISTING STYLES (unchanged) ========== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg-color: #05070a;
+      --card-bg: rgba(15, 25, 35, 0.55);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --primary-glow: #00f2ff;
+      --accent-glow: rgba(0, 242, 255, 0.35);
+      --text-primary: #f0f3f8;
+      --text-secondary: #a0b3d9;
+      --transition: all 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      --card-radius: 24px;
+      --glow-intensity: 0 0 12px rgba(0, 242, 255, 0.2);
+    }
+    body.light-mode {
+      --bg-color: #f4f7fc;
+      --card-bg: rgba(255, 255, 255, 0.85);
+      --border-subtle: rgba(0, 0, 0, 0.08);
+      --primary-glow: #1a2c3e;
+      --accent-glow: rgba(0, 0, 0, 0.12);
+      --text-primary: #0a1c2a;
+      --text-secondary: #2c4c6e;
+      --glow-intensity: 0 6px 16px rgba(0, 0, 0, 0.05);
+    }
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-primary);
+      font-family: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 2rem 1.5rem;
+      min-height: 100vh;
+      transition: var(--transition);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .grid-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: linear-gradient(var(--border-subtle) 1px, transparent 1px), linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
+      background-size: 48px 48px;
+      z-index: -2;
+      pointer-events: none;
+      opacity: 0.6;
+      transition: var(--transition);
+    }
+    body.light-mode .grid-bg {
+      background-image: linear-gradient(rgba(0, 0, 0, 0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 0, 0, 0.06) 1px, transparent 1px);
+      opacity: 0.8;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 30% 10%, rgba(0,242,255,0.02) 0%, transparent 70%);
+      z-index: -1;
+      pointer-events: none;
+    }
+    .dashboard {
+      max-width: 1360px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.4rem;
+      margin: 0 auto;
+      z-index: 10;
+    }
+    .card, .welcome-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--card-radius);
+      padding: 1.6rem 1.2rem;
+      transition: var(--transition);
+      text-decoration: none;
+      color: var(--text-primary);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    a.card { cursor: pointer; }
+    .card:hover, .welcome-card:hover {
+      transform: translateY(-6px) scale(1.01);
+      border-color: var(--primary-glow);
+      box-shadow: var(--glow-intensity), 0 16px 28px -12px rgba(0,0,0,0.3);
+      background: var(--card-bg);
+    }
+    .card.primary {
+      background: linear-gradient(135deg, rgba(0, 242, 255, 0.12), rgba(0, 0, 0, 0.45));
+      border: 1.5px solid var(--primary-glow);
+      box-shadow: 0 0 18px var(--accent-glow);
+      animation: softPulse 3s infinite ease-in-out;
+    }
+    @keyframes softPulse {
+      0% { box-shadow: 0 0 8px var(--accent-glow); border-color: rgba(0,242,255,0.5);}
+      50% { box-shadow: 0 0 26px var(--primary-glow); border-color: var(--primary-glow);}
+      100% { box-shadow: 0 0 8px var(--accent-glow); border-color: rgba(0,242,255,0.5);}
+    }
+    .card h2, .card h3, .welcome-card h2 { font-weight: 600; letter-spacing: -0.01em; margin: 0.5rem 0 0.2rem; }
+    .card p { font-size: 0.8rem; opacity: 0.8; color: var(--text-secondary); }
+    .icon { font-size: 2rem; margin-bottom: 0.5rem; }
+    .welcome-card {
+      grid-column: span 2;
+      text-align: left;
+      align-items: flex-start;
+      padding: 1.5rem 1.8rem;
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border-left: 4px solid var(--primary-glow);
+    }
+    .welcome-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .greeting-icon {
+      font-size: 2.5rem;
+      background: rgba(0,242,255,0.1);
+      border-radius: 60px;
+      padding: 0.3rem;
+      line-height: 1;
+    }
+    .welcome-text h2 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin: 0;
+    }
+    #userNameDisplay {
+      background: linear-gradient(135deg, var(--primary-glow), #aaffff);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      display: inline-block;
+    }
+    .loading-name {
+      opacity: 0.7;
+      font-weight: 500;
+      background: none !important;
+      color: var(--text-secondary) !important;
+      -webkit-background-clip: unset !important;
+    }
+    .welcome-text p { font-size: 0.85rem; margin-top: 4px; opacity: 0.8; }
+    .stats-row {
+      display: flex;
+      gap: 2rem;
+      margin-top: 1rem;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .stat-item {
+      background: rgba(255,255,255,0.05);
+      border-radius: 28px;
+      padding: 0.5rem 1rem;
+      min-width: 90px;
+      text-align: center;
+      backdrop-filter: blur(4px);
+      border: 1px solid var(--border-subtle);
+    }
+    .stat-number { font-size: 1.7rem; font-weight: 800; color: var(--primary-glow); line-height: 1; }
+    .stat-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 500; opacity: 0.7; }
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 2.8rem;
+      margin-bottom: 1.2rem;
+      align-items: center;
+      z-index: 10;
+    }
+    .expansion-trigger {
+      background: transparent;
+      border: 1.5px dashed var(--primary-glow);
+      color: var(--primary-glow);
+      font-weight: 600;
+      padding: 0.7rem 2.2rem;
+      font-size: 0.85rem;
+      letter-spacing: 1.5px;
+      border-radius: 48px;
+      backdrop-filter: blur(8px);
+      transition: 0.25s;
+      cursor: pointer;
+      font-family: monospace;
+    }
+    .expansion-trigger:hover {
+      background: var(--primary-glow);
+      color: #0a0c10;
+      border: 1.5px solid transparent;
+      box-shadow: 0 0 18px var(--primary-glow);
+    }
+    #ip-box {
+      font-family: 'Fira Code', monospace;
+      background: var(--card-bg);
+      backdrop-filter: blur(8px);
+      padding: 0.5rem 1.2rem;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      border: 1px solid var(--border-subtle);
+      letter-spacing: 0.5px;
+      color: var(--primary-glow);
+    }
+    @media (max-width: 960px) {
+      .dashboard { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+      .welcome-card, .card.primary { grid-column: span 2; }
+      body { padding: 1.2rem; }
+    }
+    @media (max-width: 560px) {
+      .dashboard { grid-template-columns: 1fr; }
+      .welcome-card, .card.primary { grid-column: span 1; }
+      .stats-row { gap: 0.8rem; }
+    }
+    a { text-decoration: none; }
+    footer { text-align: center; margin-top: 2rem; font-size: 0.7rem; opacity: 0.5; }
+  </style>
+</head>
+<body id="dashboard-root">
+
+<div class="grid-bg"></div>
+
+<div class="dashboard" id="dashboardGrid">
+  
+  <!-- WELCOME CARD -->
+  <div class="welcome-card">
+    <div class="welcome-header">
+      <div class="greeting-icon">✨</div>
+      <div class="welcome-text">
+        <h2>Welcome back, <span id="userNameDisplay" class="loading-name">loading...</span></h2>
+        <p>AI‑augmented workspace · low latency · ViPeR core</p>
+      </div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-item"><div class="stat-number">128</div><div class="stat-label">Total Notes</div></div>
+      <div class="stat-item"><div class="stat-number">12</div><div class="stat-label">Active Projects</div></div>
+      <div class="stat-item"><div class="stat-number">99.99<span style="font-size:1rem;">%</span></div><div class="stat-label">Uptime SLA</div></div>
+      <div class="stat-item"><div class="stat-number">⚡</div><div class="stat-label">Zero‑trust</div></div>
+    </div>
+    <p style="font-size:0.75rem; margin-top: 12px; opacity:0.7;">✦ Integrated ViPeR mesh | real‑time sync active</p>
+  </div>
+
+  <!-- ========== MAIN TEMPLATE CARD (now triggers parent navigation) ========== -->
+  <div class="card primary" id="mainTemplateCard">
+    <div class="icon">✦</div>
+    <h2>Main Template</h2>
+    <p>Outage ViPeR Template · Core UI</p>
+  </div>
+
+  <!-- OTHER CARDS (external links unchanged) -->
+  <a href="https://outage.wlink.com.np/" class="card" target="_blank" rel="noopener noreferrer"><h3>📡 ONS Page</h3><p>WLink outage telemetry</p></a>
+  <a href="https://mail.worldlink.com.np" class="card" target="_blank" rel="noopener noreferrer"><h3>📧 WorldLink Mail</h3><p>corporate web outlook</p></a>
+
+  <!-- ========== URGENT FV TEMPLATE CARD (triggers parent navigation) ========== -->
+  <div class="card" id="urgentTemplateCard">
+    <h3>⚠️ Urgent FV Template</h3>
+    <p>fast-escalation format</p>
+  </div>
+
+  <!-- Remaining external cards -->
+  <a href="https://mail.google.com" class="card" target="_blank" rel="noopener noreferrer"><h3>📬 Gmail</h3><p>personal or google mail</p></a>
+  <a href="https://ftth.wlink.com.np/olt/oltDetails" class="card" target="_blank" rel="noopener noreferrer"><h3>🔌 FTTH OLT</h3><p>WL fiber details</p></a>
+  <a href="https://web.whatsapp.com" class="card" target="_blank" rel="noopener noreferrer"><h3>💬 WhatsApp Web</h3><p>instant coms</p></a>
+  <a href="https://outage.bjkarn.com.np/sup" class="card" target="_blank" rel="noopener noreferrer"><h3>📋 Supervisor List - ViPeR</h3><p>Branch escalation matrix</p></a>
+  <a href="https://outage.bjkarn.com.np/monsheet" class="card" target="_blank" rel="noopener noreferrer"><h3>📊 Report Google Sheet</h3><p>live retail monitoring data</p></a>
+  <a href="/ent.html" class="card" target="_blank" rel="noopener noreferrer"><h3>🎬 Entertainment Hub</h3><p>media & relaxation</p></a>
+</div>
+
+<div class="action-bar">
+  <button class="expansion-trigger" id="expandBtn">⚡ Initialize Second-Level</button>
+  <div id="ip-box">🌐 Public IP: resolving...</div>
+</div>
+<footer>⚡ ViPeR dashboard • secure mesh • also click background to toggle theme </footer>
+
+<script>
+  // ===================== FIREBASE CONFIGURATION (identical to index.html) =====================
+  const firebaseConfig = {
+    apiKey: "AIzaSyD_g49suLWESZZ377AxsL2G8JTcEBGT0tI",
+    authDomain: "outage-login-947d8.firebaseapp.com",
+    projectId: "outage-login-947d8",
+    appId: "1:436354690312:web:3ed241912899af6a1450bd"
+  };
+
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  // ----- Helper to update displayed user name (never shows "Guest User") -----
+  function setDisplayName(name) {
+    const span = document.getElementById('userNameDisplay');
+    if (!span) return;
+    if (!name || name === 'Guest User') return;
+    span.textContent = name;
+    span.classList.remove('loading-name');
+    span.style.background = "linear-gradient(135deg, var(--primary-glow), #aaffff)";
+    span.style.webkitBackgroundClip = "text";
+    span.style.backgroundClip = "text";
+    span.style.color = "transparent";
+  }
+
+  async function fetchUserName(user) {
+    if (!user) return null;
+    try {
+      const doc = await db.collection('users').doc(user.uid).get();
+      if (doc.exists) {
+        const data = doc.data();
+        return data.name || data.displayName || null;
+      }
+    } catch (err) {
+      console.warn("Firestore error, falling back to auth data", err);
+    }
+    if (user.displayName) return user.displayName;
+    if (user.email) return user.email.split('@')[0];
+    return "User";
+  }
+
+  auth.onAuthStateChanged(async (user) => {
+    if (user) {
+      const name = await fetchUserName(user);
+      setDisplayName(name || (user.email ? user.email.split('@')[0] : "User"));
+    } else {
+      setDisplayName("User");
+    }
+  });
+
+  if (auth.currentUser) {
+    fetchUserName(auth.currentUser).then(name => setDisplayName(name));
+  }
+
+  // ========== CROSS‑FRAME NAVIGATION (parent communication) ==========
+  function sendNavigateToParent(view) {
+    if (window.parent !== window) {
+      window.parent.postMessage({ action: 'navigate', view: view }, '*');
+    } else {
+      // Fallback when not inside iframe (e.g., direct access)
+      console.warn("Not inside iframe – cannot navigate parent");
+      alert(`Navigation to ${view} would happen here in standalone mode.`);
+    }
+  }
+
+  // Main Template -> 'outage' (Outage SMS Template)
+  const mainCard = document.getElementById('mainTemplateCard');
+  if (mainCard) {
+    mainCard.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      sendNavigateToParent('outage');
+    });
+  }
+
+  // Urgent FV Template -> 'urgent' (Urgent Visit)
+  const urgentCard = document.getElementById('urgentTemplateCard');
+  if (urgentCard) {
+    urgentCard.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      sendNavigateToParent('urgent');
+    });
+  }
+
+  // ====== THEME TOGGLE (click on background) ======
+  const bodyEl = document.getElementById('dashboard-root');
+  const gridBg = document.querySelector('.grid-bg');
+  function handleGlobalThemeToggle(e) {
+    if (e.target === bodyEl || (gridBg && e.target === gridBg) || e.target === document.body) {
+      bodyEl.classList.toggle('light-mode');
+    }
+  }
+  window.addEventListener('click', handleGlobalThemeToggle);
+
+  // ====== EXPANSION BUTTON ======
+  const expandBtn = document.getElementById('expandBtn');
+  if (expandBtn) {
+    expandBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      window.open('https://bjkarn.com.np/', '_blank', 'noopener,noreferrer');
+    });
+  }
+
+  // ====== PUBLIC IP FETCH ======
+  const ipBox = document.getElementById('ip-box');
+  if (ipBox) {
+    fetch('https://api.ipify.org?format=json')
+      .then(r => r.json())
+      .then(d => ipBox.innerHTML = `🔒 SECURE_IP: ${d.ip}`)
+      .catch(() => ipBox.innerHTML = `🔒 SECURE_IP: offline (local)`);
+  }
+
+  // ====== PREVENT THEME TOGGLE ON CLICKING CARDS ======
+  document.querySelectorAll('.card, .welcome-card, #expandBtn, #ip-box').forEach(el => {
+    if (el) el.addEventListener('click', e => e.stopPropagation());
+  });
+
+  // ====== PAGESHOW RELOAD GUARD ======
+  window.addEventListener("pageshow", (event) => {
+    if (event.persisted) window.location.reload();
+  });
+</script>
+  <script src="/assets/js/security.js"></script>
+
+</body>
+</html>
