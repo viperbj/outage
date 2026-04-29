@@ -713,12 +713,12 @@
         const container = document.getElementById("dynamicContentRoot");
         if (!container) return;
         let url = "";
-        if (sectionKey === "home") url = "./viper/home-dashboard.html";
-        else if (sectionKey === "notes") url = "./viper/notes.html";
-        else if (sectionKey === "outage") url = "./viper/outage-template.html";
-        else if (sectionKey === "urgent") url = "./viper/urgent-visit.html";
-        else if (sectionKey === "linkdashboard") url = "./viper/link-dashboard.html";
-        else if (sectionKey === "branch") url = "./viper/branch.html";
+        if (sectionKey === "home") url = "../viper/home-dashboard.html";
+        else if (sectionKey === "notes") url = "../viper/notes.html";
+        else if (sectionKey === "outage") url = "../viper/outage-template.html";
+        else if (sectionKey === "urgent") url = "../viper/urgent-visit.html";
+        else if (sectionKey === "linkdashboard") url = "../viper/link-dashboard.html";
+        else if (sectionKey === "branch") url = "../viper/branch.html";
         else return;
         
         container.innerHTML = `
