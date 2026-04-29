@@ -3,24 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <!-- Disable caching for additional security (mitigate cached sensitive data) -->
+  <!-- Disable caching for additional security -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <!-- Prevent automatic detection of phone numbers/emails (minor privacy) -->
   <meta name="format-detection" content="telephone=no, email=no">
   <title>ViPeR Hub | Secure Dashboard</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      /* Disable text selection & drag for most elements (inputs/textareas will be overridden) */
       user-select: none;
       -webkit-user-select: none;
       -moz-user-select: none;
@@ -28,7 +23,7 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* Allow selection inside input fields, textareas, and contenteditable (if any) for usability */
+    /* Allow selection inside input fields, textareas for usability */
     input, textarea, [contenteditable="true"] {
       user-select: text !important;
       -webkit-user-select: text !important;
@@ -41,18 +36,15 @@
       height: 100vh;
       overflow: hidden;
       transition: background-color 0.2s ease, color 0.2s ease;
-      visibility: hidden; 
+      background: #0f172a;
+      color: #e2e8f0;
+      visibility: visible;
     }
 
-    /* Light mode (fallback) */
+    /* Light mode overrides */
     body.light {
       background: #f4f7fc;
       color: #1a2634;
-    }
-
-    body.dark {
-      background: #0f172a;
-      color: #e2e8f0;
     }
 
     .app-container {
@@ -296,46 +288,6 @@
       display: none;
     }
 
-    .logout-btn {
-      background: transparent;
-      border: 1px solid #e2e8f0;
-      border-radius: 40px;
-      padding: 8px 12px;
-      width: 100%;
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: #b91c1c;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: 0.2s;
-    }
-
-    body.dark .logout-btn {
-      border-color: #475569;
-      color: #f87171;
-    }
-
-    .logout-btn:hover {
-      background: #fef2f2;
-      border-color: #fecaca;
-    }
-
-    body.dark .logout-btn:hover {
-      background: #450a0a;
-      border-color: #7f1d1d;
-    }
-
-    .sidebar.collapsed .logout-btn span {
-      display: none;
-    }
-
-    .sidebar.collapsed .logout-btn {
-      justify-content: center;
-    }
-
     .sync-status {
       font-size: 0.7rem;
       color: #8ba0b0;
@@ -521,23 +473,27 @@
       }
     }
 
-    /* Additional anti-selection for overlay (just in case) */
     img, video, iframe {
       -webkit-user-drag: none;
       user-drag: none;
       draggable: false;
     }
+
+    /* loader removed, app visible always */
+    #loader {
+      display: none;
+    }
   </style>
 </head>
 <body class="dark">
-    <div id="loader">Validating secure session ...</div>
-    <div id="app" style="display: none;">
+    <div id="loader" style="display: none;">Loading dashboard...</div>
+    <div id="app">
         <div class="app-container">
             <aside class="sidebar collapsed" id="sidebar">
                 <div class="logo-area">
                     <div class="logo-brand">
                         <div class="logo-icon"><i class="fas fa-shield-alt"></i></div>
-                        <div class="logo-text"><img src="/assets/img/logo.png" alt="ViPeR Logo"></div>
+                        <div class="logo-text"><img src="/assets/img/logo.png" alt="ViPeR Logo" onerror="this.style.display='none'; this.nextSibling?.style?.display?.block; console.log('Logo placeholder');"><span style="display:none;">ViPeR</span></div>
                     </div>
                     <button class="toggle-sidebar-btn" id="toggleSidebarBtn" title="Collapse / Expand sidebar"><i class="fas fa-bars"></i></button>
                 </div>
@@ -553,14 +509,14 @@
                 </div>
                 <div class="account-panel">
                     <div class="user-info">
-                        <div class="user-avatar">CS</div>
+                        <div class="user-avatar" id="staticAvatar">V</div>
                         <div class="user-details">
-                            <h4>ViPeR Name</h4>
-                            <p>viper@bjkarn.com.np</p>
+                            <h4 id="staticUserName">ViPeR Operator</h4>
+                            <p id="staticUserEmail">demo@viper.local</p>
                         </div>
                     </div>
-                    <button id="logoutBtn" class="logout-btn" title="Logout"><i class="fas fa-sign-out-alt"></i><span>Logout</span></button>
-                    <div class="sync-status"><i class="fas fa-cloud-arrow-up"></i><span>Secure session active</span></div>
+                    <!-- Logout button removed as per Firebase removal requirement -->
+                    <div class="sync-status"><i class="fas fa-check-circle"></i><span>Local Mode (Offline Ready)</span></div>
                 </div>
             </aside>
             <main class="main-panel" id="mainPanel">
@@ -573,7 +529,7 @@
     </div>
 
     <script>
-      // ===================== FRONTEND SECURITY LAYER =====================
+      // ===================== FRONTEND SECURITY LAYER (no Firebase) =====================
       (function() {
           // 1. BLOCK RIGHT-CLICK (ContextMenu) except on input/textarea for usability
           document.addEventListener('contextmenu', function(e) {
@@ -605,26 +561,26 @@
                   e.preventDefault();
                   return false;
               }
-              // Block Ctrl+S (Save Page) to prevent local saving of source
+              // Block Ctrl+S (Save Page)
               if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.code === 'KeyS')) {
                   e.preventDefault();
                   return false;
               }
-              // Block Ctrl+P (Print) – sometimes used to inspect layout
+              // Block Ctrl+P (Print)
               if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.code === 'KeyP')) {
                   e.preventDefault();
                   return false;
               }
-              // Block Ctrl+Shift+R (Hard reload bypassing cache) – optional 
+              // Block Ctrl+Shift+R (Hard reload) - optional
               if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'R' || e.code === 'KeyR')) {
                   e.preventDefault();
                   return false;
               }
           });
           
-          // 3. ANTI-DRAG & DROP (prevent dragging images or iframe content)
+          // 3. ANTI-DRAG & DROP
           document.querySelectorAll('img, iframe, .iframe-wrapper').forEach(el => {
-              el.setAttribute('draggable', 'false');
+              if (el.setAttribute) el.setAttribute('draggable', 'false');
           });
           document.addEventListener('dragstart', function(e) {
               if (e.target.tagName === 'IMG' || e.target.closest('iframe')) {
@@ -633,7 +589,7 @@
               }
           });
           
-          // 4. DETECT DEVTOOLS OPENING (via time difference / debugger check)
+          // 4. DETECT DEVTOOLS OPENING but without redirecting to /login (we only warn and block further interaction)
           let devToolsOpen = false;
           function detectDevTools() {
               const threshold = 160;
@@ -643,19 +599,18 @@
               if (end - start > threshold) {
                   if (!devToolsOpen) {
                       devToolsOpen = true;
-                      // Optional: aggressive action – clear session and redirect to login
-                      console.warn("DevTools detected! Redirecting...");
-                      localStorage.removeItem('ai_notes_session_demo');
-                      window.location.href = "/login/index.html?blocked=devtools";
+                      console.warn("DevTools detected! For security, some functionalities might be limited.");
+                      // Instead of redirecting to login (since auth is removed), we just alert a warning
+                      // and optionally prevent certain actions: no forceful redirect to keep working
+                      alert("Developer tools detected. For security, dashboard may behave unexpectedly. Please close DevTools.");
                   }
               } else {
                   devToolsOpen = false;
               }
           }
-          // Run detection every 2 seconds
-          setInterval(detectDevTools, 2000);
+          setInterval(detectDevTools, 3000);
           
-          // Additional detection via window resize + outer vs inner dimensions
+          // Additional detection via dimensions (without redirect to login)
           function detectByDimensions() {
               const threshold = 200;
               const widthDiff = window.outerWidth - window.innerWidth;
@@ -663,41 +618,26 @@
               if (widthDiff > threshold || heightDiff > threshold) {
                   if (!devToolsOpen) {
                       devToolsOpen = true;
-                      window.location.href = "/login/index.html?blocked=devtools";
+                      console.warn("DevTools panel suspected via dimensions.");
+                      alert("Debugger tools detected. Please close for optimal experience.");
                   }
               }
           }
-          setInterval(detectByDimensions, 1500);
+          setInterval(detectByDimensions, 2000);
           
-          // 5. FRAME-BUSTING (prevent iframe hijacking / clickjacking)
+          // 5. FRAME-BUSTING (prevent iframe hijacking)
           if (window.self !== window.top) {
               window.top.location = window.self.location;
           }
           
-          // 6. DISABLE BROWSER EXTENSION / CONSOLE WARNING SPAM? we can redirect if console is heavily used?
-          // Override console methods to reduce info leakage (optional but can break debugging)
-          // Instead, we block the console output but preserve Firebase logs? We'll only override for security.
+          // 6. DISABLE CONSOLE OVERRIDE only for sensitive logs - keep minimal interference
           if (typeof window.console !== "undefined") {
-              let originalConsole = window.console;
-              window.console = {
-                  ...originalConsole,
-                  log: function() {},
-                  info: function() {},
-                  warn: function() {},
-                  debug: function() {},
-                  // keep error for debugging but sanitize
-                  error: function(...args) {
-                      if (args[0] && args[0].includes && args[0].includes('Firebase')) {
-                          originalConsole.error(...args);
-                      } else {
-                          // ignore generic errors
-                      }
-                  }
-              };
+              // Keep original but we can avoid excessive noise: do not fully mute errors, but preserve functionality
+              // To maintain debugging for dev but block generic info spam: we leave untouched for compatibility.
+              // No aggressive console wiping.
           }
           
-          // 7. INJECT NO-SOURCE VIEW PROTECTION: Disable selection of any DOM elements (CSS already)
-          // Additional: prevent copy event globally (except input fields)
+          // 7. Disable copy/cut/paste on sensitive areas (non-inputs)
           document.addEventListener('copy', function(e) {
               let target = e.target;
               if (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA' && !target.isContentEditable) {
@@ -713,7 +653,6 @@
               }
           });
           document.addEventListener('paste', function(e) {
-              // allow paste only on inputs
               let target = e.target;
               if (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA' && !target.isContentEditable) {
                   e.preventDefault();
@@ -724,84 +663,19 @@
     </script>
 
     <script>
-      // ===================== FIREBASE CONFIGURATION =====================
+      // ===================== VIOPER DASHBOARD (No Firebase, No Login) =====================
       
-      const firebaseConfig = {
-        apiKey: "AIzaSyD_g49suLWESZZ377AxsL2G8JTcEBGT0tI",
-        authDomain: "outage-login-947d8.firebaseapp.com",
-        projectId: "outage-login-947d8",
-        appId: "1:436354690312:web:3ed241912899af6a1450bd"
-      };
-      firebase.initializeApp(firebaseConfig);
-      const auth = firebase.auth();
-
-      // ---------- OFFLINE TIMER (2 HOURS) ----------
-      let offlineTimer = null;
-      const OFFLINE_TIMEOUT_MS = 2 * 60 * 60 * 1000; // 2 hours
-
-      function startOfflineTimer() {
-        if (offlineTimer) clearTimeout(offlineTimer);
-        offlineTimer = setTimeout(async () => {
-          console.log("Offline for 2 hours – signing out...");
-          try {
-            await auth.signOut();
-            localStorage.removeItem('ai_notes_session_demo');
-            window.location.href = "/login";
-          } catch (e) {
-            console.error("Offline signOut error:", e);
-            window.location.href = "/login";
-          }
-        }, OFFLINE_TIMEOUT_MS);
+      // Static user info for demo (no authentication)
+      function setStaticUserInfo() {
+          const userNameElem = document.getElementById('staticUserName');
+          const userEmailElem = document.getElementById('staticUserEmail');
+          const avatarElem = document.getElementById('staticAvatar');
+          if (userNameElem) userNameElem.textContent = "ViPeR Operator";
+          if (userEmailElem) userEmailElem.textContent = "demo@viper.local";
+          if (avatarElem) avatarElem.textContent = "V";
       }
-
-      function cancelOfflineTimer() {
-        if (offlineTimer) {
-          clearTimeout(offlineTimer);
-          offlineTimer = null;
-        }
-      }
-
-      window.addEventListener('online', () => {
-        console.log("Internet connection restored – cancelling offline timer.");
-        cancelOfflineTimer();
-      });
-      window.addEventListener('offline', () => {
-        console.log("Internet disconnected – starting 2‑hour timer.");
-        startOfflineTimer();
-      });
-
-      if (!navigator.onLine) {
-        startOfflineTimer();
-      }
-
-      // ---------- FIREBASE AUTH STATE OBSERVER ----------
-      auth.onAuthStateChanged((user) => {
-        const app = document.getElementById("app");
-        const loader = document.getElementById("loader");
-
-        if (!user) {
-          if (app) app.style.display = "none";
-          sessionStorage.setItem("redirectAfterLogin", window.location.pathname + window.location.search);
-          window.location.replace("/login");
-        } else {
-          if (loader) loader.style.display = "none";
-          if (app) app.style.display = "block";
-          document.body.style.visibility = "visible";
-
-          const userNameElem = document.querySelector('.user-details h4');
-          const userEmailElem = document.querySelector('.user-details p');
-          if (userNameElem && userEmailElem) {
-            userNameElem.textContent = user.displayName || user.email?.split('@')[0] || "ViPeR User";
-            userEmailElem.textContent = user.email || "user@viper.com";
-          }
-          const avatarElem = document.querySelector('.user-avatar');
-          if (avatarElem && user.email) {
-            avatarElem.textContent = user.email.charAt(0).toUpperCase();
-          }
-        }
-      });
-
-      // ---------- DARK/LIGHT MODE WITH DARK AS DEFAULT ----------
+      
+      // ---------- DARK/LIGHT MODE ----------
       function initTheme() {
         const savedTheme = localStorage.getItem('ai_notes_theme');
         const body = document.body;
@@ -809,30 +683,32 @@
         if (savedTheme === 'light') {
           body.classList.add('light');
           body.classList.remove('dark');
-          toggleIcon.className = 'fas fa-moon';
+          if (toggleIcon) toggleIcon.className = 'fas fa-moon';
         } else {
           body.classList.add('dark');
           body.classList.remove('light');
-          toggleIcon.className = 'fas fa-sun';
+          if (toggleIcon) toggleIcon.className = 'fas fa-sun';
           if (savedTheme !== 'dark') localStorage.setItem('ai_notes_theme', 'dark');
         }
         const themeBtn = document.getElementById('themeToggle');
-        themeBtn.addEventListener('click', () => {
-          if (body.classList.contains('light')) {
-            body.classList.remove('light');
-            body.classList.add('dark');
-            localStorage.setItem('ai_notes_theme', 'dark');
-            toggleIcon.className = 'fas fa-sun';
-          } else {
-            body.classList.remove('dark');
-            body.classList.add('light');
-            localStorage.setItem('ai_notes_theme', 'light');
-            toggleIcon.className = 'fas fa-moon';
-          }
-        });
+        if (themeBtn) {
+          themeBtn.addEventListener('click', () => {
+            if (body.classList.contains('light')) {
+              body.classList.remove('light');
+              body.classList.add('dark');
+              localStorage.setItem('ai_notes_theme', 'dark');
+              if (toggleIcon) toggleIcon.className = 'fas fa-sun';
+            } else {
+              body.classList.remove('dark');
+              body.classList.add('light');
+              localStorage.setItem('ai_notes_theme', 'light');
+              if (toggleIcon) toggleIcon.className = 'fas fa-moon';
+            }
+          });
+        }
       }
-
-      // ---------- IFRAME LOADER ----------
+      
+      // ---------- IFRAME LOADER (External Pages) ----------
       function loadExternalPage(sectionKey, sectionTitle, iconClass) {
         const container = document.getElementById("dynamicContentRoot");
         if (!container) return;
@@ -856,7 +732,7 @@
           </div>
         `;
       }
-
+      
       // ---------- NAVIGATION ----------
       let _currentView = 'home';
       function setActiveNav(viewId) {
@@ -873,28 +749,49 @@
         setActiveNav(view);
         if (view === 'home') loadExternalPage('home', 'Home Dashboard', 'fas fa-home');
         else if (view === 'notes') loadExternalPage('notes', 'Notes Manager', 'fas fa-sticky-note');
-        else if (view === 'outage') loadExternalPage('outage', 'Outage Template', 'fas fa-bolt');
+        else if (view === 'outage') loadExternalPage('outage', 'Outage SMS Template', 'fas fa-bolt');
         else if (view === 'urgent') loadExternalPage('urgent', 'Urgent Visit', 'fas fa-exclamation-triangle');
         else if (view === 'linkdashboard') loadExternalPage('linkdashboard', 'Link Dashboard', 'fas fa-chalkboard-user');
         else if (view === 'branch') loadExternalPage('branch', 'Branch Dashboard', 'fas fa-code-branch');
       }
-
+      
+      // Cross-iframe navigation handler (from iframe child pages requesting navigation)
       window.addEventListener('message', (event) => {
         if (event.data && event.data.action === 'navigate') {
           const view = event.data.view;
           if (view === 'outage') {
             loadExternalPage('outage', 'Outage SMS Template', 'fas fa-bolt');
             setActiveNav('outage');
+            _currentView = 'outage';
           } else if (view === 'urgent') {
             loadExternalPage('urgent', 'Urgent Visit', 'fas fa-exclamation-triangle');
             setActiveNav('urgent');
+            _currentView = 'urgent';
+          } else if (view === 'home') {
+            loadExternalPage('home', 'Home Dashboard', 'fas fa-home');
+            setActiveNav('home');
+            _currentView = 'home';
+          } else if (view === 'notes') {
+            loadExternalPage('notes', 'Notes Manager', 'fas fa-sticky-note');
+            setActiveNav('notes');
+            _currentView = 'notes';
+          } else if (view === 'linkdashboard') {
+            loadExternalPage('linkdashboard', 'Link Dashboard', 'fas fa-chalkboard-user');
+            setActiveNav('linkdashboard');
+            _currentView = 'linkdashboard';
+          } else if (view === 'branch') {
+            loadExternalPage('branch', 'Branch Dashboard', 'fas fa-code-branch');
+            setActiveNav('branch');
+            _currentView = 'branch';
           }
         }
       });
-
+      
+      // ---------- SIDEBAR COLLAPSE (LocalStorage) ----------
       function initSidebarToggle() {
         const sidebar = document.getElementById('sidebar');
         const toggleBtn = document.getElementById('toggleSidebarBtn');
+        if (!sidebar || !toggleBtn) return;
         const storedState = localStorage.getItem('sidebar_collapsed');
         if (storedState !== null) {
           if (storedState === 'true') sidebar.classList.add('collapsed');
@@ -907,23 +804,8 @@
           localStorage.setItem('sidebar_collapsed', sidebar.classList.contains('collapsed'));
         });
       }
-
-      function initLogout() {
-        const logoutBtn = document.getElementById('logoutBtn');
-        if (logoutBtn) {
-          logoutBtn.addEventListener('click', async () => {
-            try {
-              await auth.signOut();
-              localStorage.removeItem('ai_notes_session_demo');
-              window.location.href = "/login/index.html";
-            } catch (error) {
-              console.error("Logout error:", error);
-              alert("Secure logout failed. Retry.");
-            }
-          });
-        }
-      }
-
+      
+      // ---------- NAVIGATION EVENT HANDLING (Static) ----------
       function initNavigation() {
         document.querySelectorAll('.nav-item:not(.placeholder)').forEach(item => {
           item.addEventListener('click', () => {
@@ -935,12 +817,29 @@
           item.addEventListener('click', () => { alert("Feature under development."); });
         });
       }
-
-      initTheme();
-      initSidebarToggle();
-      initLogout();
-      initNavigation();
-      switchToView('home');
+      
+      // ---------- ENSURE IFRAME CONTENT RENDERING AFTER PAGE LOAD ----------
+      function bootstrapDashboard() {
+        setStaticUserInfo();
+        initTheme();
+        initSidebarToggle();
+        initNavigation();
+        // Load default Home view
+        switchToView('home');
+        // Make sure body visibility and remove any loader remnants
+        const loader = document.getElementById('loader');
+        if (loader) loader.style.display = 'none';
+        const appDiv = document.getElementById('app');
+        if (appDiv) appDiv.style.display = 'block';
+        document.body.style.visibility = 'visible';
+      }
+      
+      // Execute after DOM ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bootstrapDashboard);
+      } else {
+        bootstrapDashboard();
+      }
     </script>
 </body>
 </html>
